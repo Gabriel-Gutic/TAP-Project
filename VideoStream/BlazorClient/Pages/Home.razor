@@ -1,0 +1,53 @@
+﻿@page "/"
+@inject IVideoService VideoService
+
+<PageTitle>Home</PageTitle>
+
+<h1>Welcome to our Video Platform</h1>
+
+@foreach (var video in Videos)
+{
+    <p>Element</p>
+    <br />
+    <p>@video</p>
+    <br />
+}
+
+@if (ExceptionMessage != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @ExceptionMessage
+    </div>
+}
+
+@code {
+@using Objects;
+@using Contracts;
+@using Services;
+
+    public string? ExceptionMessage = null;
+
+    public IEnumerable<Video> Videos = new List<Video>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadVideos();
+    }
+
+    private async Task LoadVideos()
+    {
+        try
+        {
+            Videos = await VideoService.GetAll();
+
+            if (Videos == null || !Videos.Any())
+            {
+                Videos = new List<Video>();
+            }
+        }
+        catch (Exception ex)
+        {
+            ExceptionMessage = ex.Message;
+        }
+    }
+}

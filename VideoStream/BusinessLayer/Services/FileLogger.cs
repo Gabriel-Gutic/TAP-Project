@@ -28,7 +28,7 @@ namespace BusinessLayer.Services
 
 		~FileLogger()
 		{ 
-			if ( _logger != null)
+			if (_logger != null)
 			{
 				Log.CloseAndFlush();
 			}
@@ -39,6 +39,7 @@ namespace BusinessLayer.Services
 			if (_logger != null)
 			{
 				_logger.Error(error);
+				Log.CloseAndFlush();
 			}
 		}
 
@@ -47,6 +48,7 @@ namespace BusinessLayer.Services
 			if (_logger != null)
 			{
 				_logger.Information(info);
+				Log.CloseAndFlush();
 			}
 		}
 
@@ -55,6 +57,7 @@ namespace BusinessLayer.Services
 			if (_logger != null)
 			{
 				_logger.Warning(warning);
+				Log.CloseAndFlush();
 			}
 		}
 	}

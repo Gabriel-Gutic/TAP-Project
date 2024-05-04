@@ -68,5 +68,10 @@ namespace DataAccessLayer.Repository
 		{
 			return _entities.Count(predicate);
 		}
+
+		public int Count()
+		{
+            return _entities.Count(e => true);
+		}
 	}
 }

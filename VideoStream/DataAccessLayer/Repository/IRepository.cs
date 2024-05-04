@@ -9,9 +9,10 @@ namespace DataAccessLayer.Repository
         IEnumerable<T> GetAll();
         IEnumerable<T> Find(Expression<Func<T, bool>> predicate);
         bool Contains(Expression<Func<T, bool>> predicate);
+        int Count();
         int Count(Expression<Func<T, bool>> predicate);
 
-        void Add(T entity);
+		void Add(T entity);
         void Update(T entity);
         void Remove(T entity);
         bool Delete(Guid id);

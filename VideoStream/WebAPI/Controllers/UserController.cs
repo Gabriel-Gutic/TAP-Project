@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using WebAPI.Dto;
 using WebAPI.File;
 using System.IO;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace WebAPI.Controllers
 {

@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Contracts;
 using BusinessLayer.Dto;
+using BusinessLayer.Exceptions;
 using BusinessLayer.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ namespace WebAPI.Controllers
 	{
 		private readonly IVideoService _videoService;
 		private readonly IFileManager _fileManager;
+
 
 		public VideoController(IVideoService videoService, IFileManager fileManager)
 		{
@@ -123,6 +125,70 @@ namespace WebAPI.Controllers
 			return Ok("Video successfully inserted");
 		}
 
-		// TODO: Update, Delete
+		[HttpPut("Update")]
+		public async Task<IActionResult> Update(Guid id, VideoDtoInput videoDtoInput)
+		{
+			byte[]? video = null;
+			try
+			{
+				video = await _fileManager.Read(videoDtoInput.Video);
+			}
+			catch
+			{
+				return BadRequest("An error occured in video uploading");
+			}
+
+			byte[]? image = null;
+			try
+			{
+				image = await _fileManager.Read(videoDtoInput.Image);
+			}
+			catch
+			{
+				return BadRequest("An error occured in image uploading");
+			}
+
+			VideoDto videoDto = new VideoDto(
+					videoDtoInput.Title,
+					videoDtoInput.Description,
+					image,
+					video,
+					videoDtoInput.IsPublic,
+					videoDtoInput.UserId,
+					videoDtoInput.CategoryId
+				);
+
+			try
+			{
+				_videoService.Update(id, videoDto);
+				return Ok("Video successfully updated");
+			}
+			catch (EntityNotFoundException ex)
+			{
+				return NotFound(ex.Message);
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
+
+		[HttpDelete("Delete")]
+		public IActionResult Delete(Guid id)
+		{
+			try
+			{
+				_videoService.Delete(id);
+				return Ok("Video successfully deleted");
+			}
+			catch (EntityNotFoundException ex)
+			{
+				return NotFound(ex.Message);
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
 	}
 }

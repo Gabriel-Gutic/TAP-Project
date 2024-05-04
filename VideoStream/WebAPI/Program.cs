@@ -6,6 +6,7 @@ using BusinessLayer.Services;
 using WebAPI.File;
 using DataAccessLayer.Tools;
 
+
 namespace WebAPI
 {
     public class Program
@@ -13,6 +14,16 @@ namespace WebAPI
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddCors(option =>
+            {
+                option.AddPolicy("Default", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
+            });
 
             // Add services to the container.
 
@@ -28,9 +39,12 @@ namespace WebAPI
             builder.Services.AddScoped<IAppLogger, FileLogger>();
 
             //Services
+            builder.Services.AddScoped<IVideoSelector, RandomVideoSelector>();
+			
             builder.Services.AddScoped<IVideoCategoryService, VideoCategoryService>();
 			builder.Services.AddScoped<IUserService, UserService>();
 			builder.Services.AddScoped<IVideoService, VideoService>();
+			builder.Services.AddScoped<IViewService, ViewService>();
 			
             // Scopes
             builder.Services.AddScoped<IFileManager, FileManager>();
@@ -51,7 +65,7 @@ namespace WebAPI
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
+            app.UseCors("Default");
 
             app.MapControllers();
 

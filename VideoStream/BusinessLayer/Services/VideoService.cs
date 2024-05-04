@@ -22,6 +22,11 @@ namespace BusinessLayer.Services
 			_logger = logger;
 		}
 
+		public int GetCount()
+		{
+			return _videoRepository.Count();
+		}
+
 		public IEnumerable<VideoDto> GetAll()
 		{
 			return _videoRepository.GetAll()
@@ -37,7 +42,7 @@ namespace BusinessLayer.Services
 					));
 		}
 
-		public VideoDto? Get(Guid id)
+        public VideoDto? Get(Guid id)
 		{
 			var video = _videoRepository.GetById(id);
 			if (video == null)
@@ -92,6 +97,7 @@ namespace BusinessLayer.Services
 			video.CategoryId = userDto.CategoryId;
 
 			_videoRepository.SaveChanges();
+
 			_logger.Info("Item updated in Video Table");
 		}
 
@@ -105,5 +111,5 @@ namespace BusinessLayer.Services
 
 			_logger.Info("Item deleted from Video Table");
 		}
-	}
+    }
 }
