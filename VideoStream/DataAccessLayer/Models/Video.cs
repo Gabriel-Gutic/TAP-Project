@@ -10,8 +10,8 @@ namespace DataAccessLayer.Models
     {
         public string Title { get; set; }
         public string Description { get; set; }
-        public byte[] Image { get; set; }
-        public byte[] Data { get; set; }
+        public string ImagePath { get; set; }
+        public string Path { get; set; }
         public bool IsPublic { get; set; }
         
         public Guid UserId { get; set; }
@@ -26,10 +26,6 @@ namespace DataAccessLayer.Models
 
 		public Video()
         {
-            Title = "";
-            Description = "";
-            Image = null;
-
             Feedback = new List<Feedback>();
             Comments = new List<Comment>();
             Views = new List<View>();

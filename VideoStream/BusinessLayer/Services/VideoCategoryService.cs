@@ -25,7 +25,7 @@ namespace BusinessLayer.Services
 		public IEnumerable<VideoCategoryDto> GetAll()
 		{
 			return _videoCategoryRepository.GetAll()
-				.Select(vc => new VideoCategoryDto(vc.Name, vc.CreatedAt));
+				.Select(vc => new VideoCategoryDto(vc.Id, vc.Name, vc.CreatedAt));
 		}
 
 		public VideoCategoryDto? Get(Guid id)
@@ -35,7 +35,7 @@ namespace BusinessLayer.Services
 			{
 				return null;
 			}
-			return new VideoCategoryDto(videoCategory.Name, videoCategory.CreatedAt);
+			return new VideoCategoryDto(id, videoCategory.Name, videoCategory.CreatedAt);
 		}
 
 		public void Insert(VideoCategoryDto videoCategoryDto)

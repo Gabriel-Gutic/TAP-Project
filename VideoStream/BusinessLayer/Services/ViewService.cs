@@ -25,7 +25,7 @@ namespace BusinessLayer.Services
 		public IEnumerable<ViewDto> GetAll()
 		{
 			return _viewRepository.GetAll()
-				.Select(v => new ViewDto(v.UserId, v.VideoId, v.CreatedAt));
+				.Select(v => new ViewDto(v.Id, v.UserId, v.VideoId, v.CreatedAt));
 		}
 
 		public ViewDto? Get(Guid id)
@@ -35,7 +35,7 @@ namespace BusinessLayer.Services
 			{
 				return null;
 			}
-			return new ViewDto(view.UserId, view.VideoId, view.CreatedAt);
+			return new ViewDto(id, view.UserId, view.VideoId, view.CreatedAt);
 		}
 
 		public void Insert(ViewDto viewDto)
@@ -44,7 +44,6 @@ namespace BusinessLayer.Services
 			{
 				UserId = viewDto.UserId,
 				VideoId = viewDto.VideoId,
-				CreatedAt = viewDto.CreatedAt,
 			});
 
 			_viewRepository.SaveChanges();

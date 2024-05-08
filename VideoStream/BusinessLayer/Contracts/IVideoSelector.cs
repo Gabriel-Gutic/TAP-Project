@@ -10,6 +10,7 @@ namespace BusinessLayer.Contracts
 {
 	public interface IVideoSelector
 	{
-		public IEnumerable<FullVideoDto> SelectForUser(Guid userId, int count);
+		public IEnumerable<VideoDto> SelectForUser(Guid userId, int count);
+		public IEnumerable<VideoDto> SelectForUser(string username, int count);
 	}
 }

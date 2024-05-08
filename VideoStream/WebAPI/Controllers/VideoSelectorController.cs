@@ -17,14 +17,20 @@ namespace WebAPI.Controllers
 			_videoCount = 20;
 		}
 
-		[HttpGet("Select")]
-		public IActionResult Select()
+		[HttpGet("SelectForId")]
+		public IActionResult Select(Guid id)
 		{
-			IEnumerable<FileContentResult> videos;
-			videos = _videoSelector.SelectForUser(new Guid("0F4316C5-4142-4D48-B8ED-1A19B2821EA8"), _videoCount)
-				.Select(v => File(v.Data, "video/mp4"));
+			var videos = _videoSelector.SelectForUser(id, _videoCount);
 			
 			return Ok(videos);
 		}
-	}
+
+        [HttpGet("SelectForUsername")]
+        public IActionResult Select(string? username)
+        {
+            var videos = _videoSelector.SelectForUser(username, _videoCount);
+
+            return Ok(videos);
+        }
+    }
 }

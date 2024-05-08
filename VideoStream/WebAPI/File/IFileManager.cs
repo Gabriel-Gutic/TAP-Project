@@ -2,6 +2,9 @@
 {
 	public interface IFileManager
 	{
-		public Task<byte[]>? Read(IFormFile file);
-	}
+        public Task<string?> Extract(IFormFile file, string destination);
+        public Task<string?> ExtractImage(IFormFile file);
+        public Task<string?> ExtractVideo(IFormFile file);
+        public void Delete(string? filePath);
+    }
 }

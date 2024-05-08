@@ -31,15 +31,16 @@ namespace BusinessLayer.Services
 		{
 			return _videoRepository.GetAll()
 				.Select(v => new VideoDto(
-						v.Title,
-						v.Description,
-						v.Image,
-						v.Data,
-						v.IsPublic,
-						v.CreatedAt,
-						v.UserId,
-						v.CategoryId
-					));
+					v.Id,
+					v.Title,
+					v.Description,
+					v.ImagePath,
+					v.Path,
+					v.IsPublic,
+					v.CreatedAt,
+					v.UserId,
+					v.CategoryId
+				));
 		}
 
         public VideoDto? Get(Guid id)
@@ -51,15 +52,16 @@ namespace BusinessLayer.Services
 			}
 
 			return new VideoDto(
-					video.Title,
-					video.Description,
-					video.Image,
-					video.Data,
-					video.IsPublic,
-					video.CreatedAt,
-					video.UserId,
-					video.CategoryId
-				);
+				video.Id,
+				video.Title,
+				video.Description,
+				video.ImagePath,
+				video.Path,
+				video.IsPublic,
+				video.CreatedAt,
+				video.UserId,
+				video.CategoryId
+			);
 		}
 
 		public void Insert(VideoDto userDto)
@@ -68,8 +70,8 @@ namespace BusinessLayer.Services
 			{
 				Title = userDto.Title,
 				Description = userDto.Description,
-				Image = userDto.Image,
-				Data = userDto.Data,
+                ImagePath = userDto.ImagePath,
+                Path = userDto.Path,
 				IsPublic = userDto.IsPublic,
 				UserId = userDto.UserId,
 				CategoryId = userDto.CategoryId
@@ -90,8 +92,8 @@ namespace BusinessLayer.Services
 
 			video.Title = userDto.Title;
 			video.Description = userDto.Description;
-			video.Image = userDto.Image;
-			video.Data = userDto.Data;
+			video.ImagePath = userDto.ImagePath;
+			video.Path = userDto.Path;
 			video.IsPublic = userDto.IsPublic;
 			video.UserId = userDto.UserId;
 			video.CategoryId = userDto.CategoryId;

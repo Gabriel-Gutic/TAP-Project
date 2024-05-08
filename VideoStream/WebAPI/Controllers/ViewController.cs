@@ -51,7 +51,7 @@ namespace WebAPI.Controllers
 			return Ok("View successfully inserted");
 		}
 
-		[HttpPut("Update")]
+        [HttpPut("Update")]
 		public IActionResult Update(Guid id, ViewDtoInput viewDtoInput)
 		{
 			try

@@ -4,7 +4,9 @@ using BusinessLayer.Exceptions;
 using BusinessLayer.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.CompilerServices;
 using WebAPI.Dto;
+using WebAPI.Exceptions;
 using WebAPI.File;
 
 namespace WebAPI.Controllers
@@ -27,14 +29,17 @@ namespace WebAPI.Controllers
 		public IActionResult GetAll()
 		{
 			var entities = _videoService.GetAll()
-				.Select(v => new VideoDtoOutput(
-						v.Title,
-						v.Description,
-						v.IsPublic,
-						v.CreatedAt,
-						v.UserId,
-						v.CategoryId
-					));
+				.Select(v => new VideoDto(
+					v.Id,
+					v.Title,
+					v.Description,
+					v.ImagePath,
+					v.Path,
+					v.IsPublic,
+					v.CreatedAt,
+					v.UserId,
+					v.CategoryId
+				));
 
 			return Ok(entities);
 		}
@@ -49,72 +54,42 @@ namespace WebAPI.Controllers
 				return NotFound("Video not found");
 			}
 
-			var videoOut = new VideoDtoOutput(
-					video.Title,
-					video.Description,
-					video.IsPublic,
-					video.CreatedAt,
-					video.UserId,
-					video.CategoryId
-				);
+			var videoOut = new VideoDto(
+				video.Id,
+				video.Title,
+				video.Description,
+				video.ImagePath,
+				video.Path,
+				video.IsPublic,
+				video.CreatedAt,
+				video.UserId,
+				video.CategoryId
+			);
 
 			return Ok(videoOut);
-		}
-
-		[HttpGet("GetImage")]
-		public IActionResult GetImage(Guid id)
-		{
-			var video = _videoService.Get(id);
-
-			if (video == null)
-			{
-				return NotFound("Video not found");
-			}
-
-			return File(video.Image, "image/png");
-		}
-
-		[HttpGet("GetVideo")]
-		public IActionResult GetVideo(Guid id)
-		{
-			var video = _videoService.Get(id);
-
-			if (video == null)
-			{
-				return NotFound("Video not found");
-			}
-
-			return File(video.Data, "video/mp4", "video.mp4");
 		}
 
 		[HttpPost("Insert")]
 		public async Task<IActionResult> Insert(VideoDtoInput videoDtoInput)
 		{
-			byte[]? video = null;
+			string[] paths;
 			try
 			{
-				video = await _fileManager.Read(videoDtoInput.Video);
+                paths = await ExtractImageAndVideo(videoDtoInput.Image, videoDtoInput.Video);
 			}
-			catch
+			catch (Exception ex)
 			{
-				return BadRequest("An error occured in video uploading");
+				return BadRequest(ex.Message);
 			}
 
-			byte[]? image = null;
-			try
-			{
-				image = await _fileManager.Read(videoDtoInput.Image);
-			}
-			catch
-			{
-				return BadRequest("An error occured in image uploading");
-			}
+            string imagePath = paths[0];
+            string path = paths[1];
 
-			VideoDto videoDto = new VideoDto(
+            VideoDto videoDto = new VideoDto(
 					videoDtoInput.Title,
 					videoDtoInput.Description,
-					image,
-					video,
+					imagePath,
+					path,
 					videoDtoInput.IsPublic,
 					videoDtoInput.UserId,
 					videoDtoInput.CategoryId
@@ -128,31 +103,24 @@ namespace WebAPI.Controllers
 		[HttpPut("Update")]
 		public async Task<IActionResult> Update(Guid id, VideoDtoInput videoDtoInput)
 		{
-			byte[]? video = null;
-			try
-			{
-				video = await _fileManager.Read(videoDtoInput.Video);
-			}
-			catch
-			{
-				return BadRequest("An error occured in video uploading");
-			}
+            string[] paths;
+            try
+            {
+                paths = await ExtractImageAndVideo(videoDtoInput.Image, videoDtoInput.Video);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
-			byte[]? image = null;
-			try
-			{
-				image = await _fileManager.Read(videoDtoInput.Image);
-			}
-			catch
-			{
-				return BadRequest("An error occured in image uploading");
-			}
+            string imagePath = paths[0];
+            string path = paths[1];
 
-			VideoDto videoDto = new VideoDto(
+            VideoDto videoDto = new VideoDto(
 					videoDtoInput.Title,
 					videoDtoInput.Description,
-					image,
-					video,
+					imagePath,
+					path,
 					videoDtoInput.IsPublic,
 					videoDtoInput.UserId,
 					videoDtoInput.CategoryId
@@ -160,12 +128,18 @@ namespace WebAPI.Controllers
 
 			try
 			{
+				VideoDto? video = _videoService.Get(id);
 				_videoService.Update(id, videoDto);
+
+				_fileManager.Delete(video.ImagePath);
+				_fileManager.Delete(video.Path);
+
 				return Ok("Video successfully updated");
 			}
 			catch (EntityNotFoundException ex)
 			{
 				return NotFound(ex.Message);
+
 			}
 			catch (Exception ex)
 			{
@@ -178,8 +152,13 @@ namespace WebAPI.Controllers
 		{
 			try
 			{
-				_videoService.Delete(id);
-				return Ok("Video successfully deleted");
+                VideoDto? video = _videoService.Get(id);
+
+                _videoService.Delete(id);
+
+                _fileManager.Delete(video.ImagePath);
+                _fileManager.Delete(video.Path);
+                return Ok("Video successfully deleted");
 			}
 			catch (EntityNotFoundException ex)
 			{
@@ -190,5 +169,24 @@ namespace WebAPI.Controllers
 				return BadRequest(ex.Message);
 			}
 		}
+
+		private async Task<string[]> ExtractImageAndVideo(IFormFile image, IFormFile video)
+		{
+            string imagePath = null;
+            string path = null;
+
+            imagePath = await _fileManager.ExtractImage(image);
+            if (imagePath == null)
+            {
+                throw new FileUploadException("Failed to upload image");
+            }
+            path = await _fileManager.ExtractVideo(video);
+            if (path == null)
+            {
+                throw new FileUploadException("Failed to upload image");
+            }
+
+			return [imagePath, path];
+        }
 	}
 }

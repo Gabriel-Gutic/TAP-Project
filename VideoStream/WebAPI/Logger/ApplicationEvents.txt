@@ -10,3 +10,7 @@
 2024-05-04 13:50:36.189 +03:00 [INF] New item inserted in VideoCategory Table
 2024-05-04 13:50:53.326 +03:00 [INF] Item updated in VideoCategory Table
 2024-05-04 13:51:02.160 +03:00 [INF] Item deleted from VideoCategory Table
+2024-05-05 15:17:39.253 +03:00 [INF] New item inserted in User Table
+2024-05-05 15:18:17.538 +03:00 [INF] Item updated in User Table
+2024-05-05 15:18:28.873 +03:00 [INF] Item deleted from User Table
+2024-05-05 15:37:38.281 +03:00 [INF] New item inserted in Video Table

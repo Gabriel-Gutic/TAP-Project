@@ -1,17 +1,24 @@
 ﻿@page "/"
+@using BlazorClient.Components
 @inject IVideoService VideoService
 
 <PageTitle>Home</PageTitle>
 
 <h1>Welcome to our Video Platform</h1>
 
+<div class="d-flex">
 @foreach (var video in Videos)
 {
-    <p>Element</p>
-    <br />
-    <p>@video</p>
-    <br />
+    <div class="me-2">
+        <VideoCard 
+            Id = "@video.Id"
+            Title="@video.Title" 
+            Image="@video.ImagePath"
+            Creator="@video.Creator">
+        </VideoCard>
+    </div>
 }
+</div>
 
 @if (ExceptionMessage != null)
 {
@@ -21,13 +28,14 @@
 }
 
 @code {
-@using Objects;
+@using Data;
+@using Dto;
 @using Contracts;
 @using Services;
 
     public string? ExceptionMessage = null;
 
-    public IEnumerable<Video> Videos = new List<Video>();
+    public IEnumerable<VideoCardData> Videos = new List<VideoCardData>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -38,11 +46,11 @@
     {
         try
         {
-            Videos = await VideoService.GetAll();
+            Videos = await VideoService.SelectForUser();
 
             if (Videos == null || !Videos.Any())
             {
-                Videos = new List<Video>();
+                Videos = new List<VideoCardData>();
             }
         }
         catch (Exception ex)

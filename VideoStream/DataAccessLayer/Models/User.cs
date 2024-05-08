@@ -12,7 +12,7 @@ namespace DataAccessLayer.Models
         public string Username { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public byte[]? Image { get; set; }
+        public string? ImagePath { get; set; }
         public bool IsAdmin { get; set; }
         public bool IsActive { get; set; }
 
@@ -32,7 +32,7 @@ namespace DataAccessLayer.Models
         {
             Username = "";
             Password = "";
-            Image = null;
+            ImagePath = null;
             IsAdmin = false;
             IsActive = true;
 

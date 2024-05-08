@@ -1,0 +1,156 @@
+﻿@page "/video/{id}"
+@using Radzen
+@using Radzen.Blazor
+@using BlazorClient.Components
+
+<PageTitle>Video</PageTitle>
+
+@if (Video != null)
+{
+    <div class="row">
+        <div class="col">
+            <video width="100%" height="auto" controls>
+                <source src="@Video.Path" type="video/mp4">
+                Your browser does not support the current video.
+            </video>
+            <br />
+            <h2>@Video.Title</h2>
+            <h4>Posted: @Video.CreatedAt</h4>
+            <br />
+            <hr class="hr" />
+            <h4>Description:</h4>
+            <p>@Video.Description</p>
+            <br />
+            <br />
+            <br />
+            <br />
+            <hr class="hr" />
+            <h3>Comments</h3>
+            @if (CurrentUser != null)
+            {
+                <form @onsubmit="SendComment">
+                    <div class="row">
+                        <div class="form-group col">
+                            <input type="text" class="form-control" id="comment" @bind="@Comment">
+                        </div>
+                        <div class="col col-lg-3">
+                            <button type="submit" class="btn btn-primary">Add comment</button>
+                        </div>
+                    </div>
+
+                </form>
+            }
+
+            <br />
+            @if (Comments != null)
+            {
+                <RadzenDataList WrapItems="false" AllowPaging="false"
+                    Data="@Comments" TItem="CommentData" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"> 
+                    <Template Context="comment">
+                        <RadzenCard Style="width: 100%; padding: 0;">
+                            <hr class="hr" />
+                            <RadzenRow Gap="0">
+                                <RadzenColumn Size="12" SizeLG="3" Class="rz-p-4 product-title">
+                                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" class="rz-color-secondary">@(comment.Username)</RadzenText>
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeLG="3" Class="rz-p-4 product-title">
+                                    <RadzenText TextStyle="TextStyle.Body2" class="rz-color-secondary">Posted: @(comment.CreatedAt)</RadzenText>
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeLG="7" Class="rz-p-4">
+                                    <RadzenRow Gap="0">
+                                        <RadzenColumn Size="12" SizeMD="6" SizeLG="2">
+                                            <RadzenText TextStyle="TextStyle.Body2">@(comment.Message)</RadzenText>
+                                        </RadzenColumn>
+                                    </RadzenRow>
+                                </RadzenColumn>
+                                @if (CurrentUser != null && CurrentUser.Username == comment.Username)
+                                {
+                                    <RadzenColumn Size="12" SizeLG="2" Class="rz-p-4">
+                                        <RadzenButton Text="Delete" Style="width: 100%" Click=@(args => DeleteComment(comment.Id)) />
+                                    </RadzenColumn>
+                                }
+                            </RadzenRow>
+                        </RadzenCard>
+                    </Template>
+                </RadzenDataList>
+            }
+        </div>
+        <div class="col-lg-3">
+            @if (Videos != null)
+            {
+                <div class="d-block">
+                @foreach (var video in Videos)
+                {
+                    <div class="me-2 mb-3">
+                        <VideoCard 
+                            Id = "@video.Id"
+                            Title="@video.Title" 
+                            Image="@video.ImagePath"
+                            Creator="@video.Creator">
+                        </VideoCard>
+                    </div>
+                }
+                </div>
+            }
+        </div>
+    </div>
+    <br />
+    <br />
+    <br />
+    <br />
+}
+
+
+@code {
+@using Data;
+@using Contracts
+@inject IUserService UserService
+@inject IVideoService VideoService
+@inject IViewService ViewService
+@inject ICommentService CommentService
+@inject NavigationManager NavigationManager
+
+    public UserData? CurrentUser { get; set; }
+
+    [Parameter]
+    public string Id { get; set; }
+    public VideoData? Video;
+
+    public string Comment { get; set; }
+    public IEnumerable<CommentData> Comments = new List<CommentData>();
+
+    public IEnumerable<VideoCardData> Videos = new List<VideoCardData>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        CurrentUser = await UserService.GetCurrent();
+
+        Video = await VideoService.GetVideo(Id);
+        if (Video == null)
+        {
+            NavigationManager.NavigateTo("/", true);
+        }
+
+        Comments = await CommentService.GetForVideo(Video.Id);
+        Videos = await VideoService.SelectForUser();
+
+        ViewService.CreateView(Video.Id);
+    }
+
+    public async void SendComment()
+    {
+        if (CurrentUser == null || string.IsNullOrEmpty(Comment))
+            return;
+
+        await CommentService.SendComment(Comment, Video.Id);
+
+        NavigationManager.Refresh(true);
+    }
+
+    public async void DeleteComment(Guid id)
+    {
+        CommentService.DeleteComment(id);
+
+        NavigationManager.Refresh(true);
+    }
+}

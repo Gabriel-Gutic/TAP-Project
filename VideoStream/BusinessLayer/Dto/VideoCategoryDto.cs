@@ -9,18 +9,25 @@ namespace BusinessLayer.Dto
 {
 	public class VideoCategoryDto
 	{
+		public Guid Id { get; set; }
 		public string Name { get; set; }
 		public DateTime CreatedAt { get; set; }
 
-		public VideoCategoryDto(string name, DateTime createdAt) 
+		public VideoCategoryDto(Guid id, string name, DateTime createdAt) 
 		{ 
+			Id = id;
 			Name = name;
 			CreatedAt = createdAt;
 		}
 
-		public VideoCategoryDto(string name)
-			:this(name, DateTime.Now)
+		public VideoCategoryDto(Guid id, string name)
+			:this(id, name, DateTime.Now)
 		{
 		}
-	}
+
+        public VideoCategoryDto(string name)
+            : this(Guid.NewGuid(), name, DateTime.Now)
+        {
+        }
+    }
 }

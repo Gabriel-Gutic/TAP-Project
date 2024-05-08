@@ -3,7 +3,6 @@ using BusinessLayer.Dto;
 using BusinessLayer.Exceptions;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repository;
-using DataAccessLayer.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,14 +28,15 @@ namespace BusinessLayer.Services
 		{
 			return _userRepository.GetAll()
 				.Select(u => new UserDto(
-						u.Username,
-						u.Email,
-						u.Password,
-						u.Image,
-						u.IsAdmin,
-						u.IsActive,
-						u.CreatedAt
-					));
+					u.Id,
+					u.Username,
+					u.Email,
+					u.Password,
+					u.ImagePath,
+					u.IsAdmin,
+					u.IsActive,
+					u.CreatedAt
+				));
 		}
 
 		public UserDto? Get(Guid id)
@@ -47,14 +47,15 @@ namespace BusinessLayer.Services
 				return null;
 			}
 			return new UserDto(
-					user.Username,
-					user.Email,
-					user.Password,
-					user.Image,
-					user.IsAdmin,
-					user.IsActive,
-					user.CreatedAt
-				);
+				user.Id,
+				user.Username,
+				user.Email,
+				user.Password,
+				user.ImagePath,
+				user.IsAdmin,
+				user.IsActive,
+				user.CreatedAt
+			);
 		}
 
 		public void Insert(UserDto userDto)
@@ -73,7 +74,7 @@ namespace BusinessLayer.Services
 				Username = userDto.Username,
 				Email = userDto.Email,
 				Password = _passwordHandler.Hash(userDto.Password),
-				Image = userDto.Image,
+                ImagePath = userDto.ImagePath,
 				IsAdmin = userDto.IsAdmin,
 				IsActive = userDto.IsActive
 			});
@@ -103,7 +104,7 @@ namespace BusinessLayer.Services
 			user.Username = userDto.Username;
 			user.Email = userDto.Email;
 			user.Password = _passwordHandler.Hash(userDto.Password);
-			user.Image = userDto.Image;
+			user.ImagePath = userDto.ImagePath;
 			user.IsAdmin = userDto.IsAdmin;
 			user.IsActive = userDto.IsActive;
 
@@ -122,5 +123,5 @@ namespace BusinessLayer.Services
 
 			_logger.Info("Item deleted from User Table");
 		}
-	}
+    }
 }

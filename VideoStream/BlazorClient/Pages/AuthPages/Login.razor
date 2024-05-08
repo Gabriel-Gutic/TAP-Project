@@ -1,0 +1,38 @@
+﻿@page "/login/{ErrorMessage?}"
+<h3>Login</h3>
+
+@if (ErrorMessage != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @ErrorMessage
+    </div>
+}
+
+<form @onsubmit="HandleSubmit">
+    <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" class="form-control" id="username" @bind="User.Username">
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" id="password" @bind="User.Password">
+    </div>
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>
+
+
+@code {
+    @using Dto;
+    @using Contracts;
+    @inject IAuthService AuthService
+
+    [Parameter]
+    public string? ErrorMessage { get; set; }
+
+    public AuthDto User = new AuthDto("", "");
+
+    public async void HandleSubmit()
+    {
+        await AuthService.Login(User);
+    }
+}

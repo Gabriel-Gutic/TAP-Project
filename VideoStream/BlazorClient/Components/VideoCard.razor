@@ -1,0 +1,33 @@
+﻿
+
+<div class="card" style="width: 15rem;">
+    <a class="btn btn-primary" @onclick="GoTo">
+        <img src="@Image" class="card-img-top" alt="...">
+    </a>
+    <div class="card-body">
+        <h5 class="card-title">@Title</h5>
+        <p class="card-text">Creator: @Creator</p>
+    </div>
+</div>
+
+@code
+{
+    @inject NavigationManager NavigationManager
+
+    [Parameter]
+    public Guid Id { get; set; }
+
+    [Parameter]
+    public string Image { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string Creator { get; set; }
+
+    public void GoTo()
+    {
+        NavigationManager.NavigateTo($"/video/{Id}", true);
+    }
+}

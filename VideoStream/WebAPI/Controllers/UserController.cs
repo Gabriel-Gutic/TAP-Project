@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebAPI.Dto;
 using WebAPI.File;
 using System.IO;
+using DataAccessLayer.Models;
 
 namespace WebAPI.Controllers
 {
@@ -27,10 +28,12 @@ namespace WebAPI.Controllers
 		public IActionResult GetAll() 
 		{
 			var entities = _userService.GetAll()
-				.Select(u => new UserDtoOutput(
+				.Select(u => new UserDto(
+						u.Id,
 						u.Username,
 						u.Email,
-						u.Password, 
+						u.Password,
+						u.ImagePath,
 						u.IsAdmin,
 						u.IsActive,
 						u.CreatedAt
@@ -49,54 +52,38 @@ namespace WebAPI.Controllers
 				return NotFound("User not found");
 			}
 
-			var userOut = new UserDtoOutput(
-					user.Username,
-					user.Email,
-					user.Password,
-					user.IsAdmin,
-					user.IsActive,
-					user.CreatedAt
-				);
+			var userOut = new UserDto(
+				user.Id,
+				user.Username,
+				user.Email,
+				user.Password,
+				user.ImagePath,
+				user.IsAdmin,
+				user.IsActive,
+				user.CreatedAt
+			);
 
 			return Ok(userOut);
-		}
-
-		[HttpGet("GetImage")]
-		public IActionResult GetImage(Guid id)
-		{
-			var user = _userService.Get(id);
-
-			if (user == null)
-			{
-				return NotFound("User not found");
-			}
-
-			if (user.Image == null)
-			{
-				return NotFound("Selected user does not have an image");
-			}
-
-			return File(user.Image, "image/png");
 		}
 
 		[HttpPost("Insert")]
 		public async Task<IActionResult> Insert(UserDtoInput userDtoInput)
 		{
-			byte[]? bytes = null;
+			string? imagePath = null;
 			try
 			{
-				bytes = await _fileManager.Read(userDtoInput.Image);
+                imagePath = await _fileManager.ExtractImage(userDtoInput.Image);
 			}
-			catch
+			catch (Exception ex)
 			{
-				return BadRequest("An error occured in image uploading");
+				return BadRequest(ex);
 			}
 
 			UserDto userDto = new UserDto(
 				userDtoInput.Username,
 				userDtoInput.Email,
 				userDtoInput.Password,
-				bytes,
+				imagePath,
 				userDtoInput.IsAdmin,
 				userDtoInput.IsActive
 			);
@@ -108,6 +95,10 @@ namespace WebAPI.Controllers
 			}
 			catch (Exception ex)
 			{
+				if (imagePath != null)
+				{
+					_fileManager.Delete(imagePath);
+				}
 				return BadRequest(ex.Message);
 			}
 		}
@@ -115,37 +106,54 @@ namespace WebAPI.Controllers
 		[HttpPut("Update")]
 		public async Task<IActionResult> Update(Guid id, UserDtoInput userDtoInput)
 		{
-			byte[]? bytes = null;
-			try
-			{
-				bytes = await _fileManager.Read(userDtoInput.Image);
-			}
-			catch
-			{
-				return BadRequest("An error occured in image uploading");
-			}
+            string? imagePath = null;
+            try
+            {
+                imagePath = await _fileManager.ExtractImage(userDtoInput.Image);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
 
-			UserDto userDto = new UserDto(
+            UserDto userDto = new UserDto(
 				userDtoInput.Username,
 				userDtoInput.Email,
 				userDtoInput.Password,
-				bytes,
+				imagePath,
 				userDtoInput.IsAdmin,
 				userDtoInput.IsActive
 			);
 
 			try
 			{
+				UserDto? user = _userService.Get(id);
+				string? oldImagePath = user.ImagePath;
+
 				_userService.Update(id, userDto);
+
+				if (oldImagePath != null)
+				{
+					_fileManager.Delete(oldImagePath);
+				}
+
 				return Ok("User successfully updated");
 			}
 			catch (EntityNotFoundException ex)
 			{
+				if (imagePath != null)
+				{
+					_fileManager.Delete(imagePath);
+				}
 				return NotFound(ex.Message);
 			}
 			catch (Exception ex)
 			{
-				return BadRequest(ex.Message);
+                if (imagePath != null)
+                {
+                    _fileManager.Delete(imagePath);
+                }
+                return BadRequest(ex.Message);
 			}
 		}
 
@@ -154,8 +162,12 @@ namespace WebAPI.Controllers
 		{
 			try
 			{
+				UserDto? user = _userService.Get(id);
+				string? imagePath = user.ImagePath;
+
 				_userService.Delete(id);
-				return Ok("User successfully deleted");
+				_fileManager.Delete(imagePath);
+                return Ok("User successfully deleted");
 			}
 			catch (EntityNotFoundException ex)
 			{
