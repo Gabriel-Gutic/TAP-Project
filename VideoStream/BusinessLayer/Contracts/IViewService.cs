@@ -13,6 +13,8 @@ namespace BusinessLayer.Contracts
 
 		public ViewDto? Get(Guid id);
 
+		public int Count(Guid videoId);
+
 		public void Insert(ViewDto viewDto);
 
 		public void Update(Guid id, ViewDto viewDto);

@@ -30,6 +30,19 @@ namespace BlazorClient.Services
             return await SendRequest<T>(request);
         }
 
+        public async Task<T?> Get<T>(string uri, string key1, object value1, string key2, object value2)
+        {
+            string _uri = uri;
+            if (string.IsNullOrEmpty(key1) || value1 == null || string.IsNullOrEmpty(key2) || value2 == null)
+            {
+                throw new ArgumentException("Invalid argument");
+            }
+            _uri += "?" + key1 + "=" + value1 + "&" + key2 + "=" + value2;
+            var request = new HttpRequestMessage(HttpMethod.Get, _uri);
+
+            return await SendRequest<T>(request);
+        }
+
         public string GetAPI()
         {
             return _httpClient.BaseAddress.ToString();
@@ -45,9 +58,30 @@ namespace BlazorClient.Services
             return await SendRequest<T>(request);
         }
 
+        public async Task<T?> Patch<T>(string uri, object content)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Patch, uri);
+
+            // set request body
+            request.Content = new StringContent(JsonSerializer.Serialize(content), Encoding.UTF8, "application/json");
+
+            return await SendRequest<T>(request);
+        }
+
         public async Task<T?> Delete<T>(string uri, Guid id)
         {
             var request = new HttpRequestMessage(HttpMethod.Delete, $"{uri}?id={{{id}}}");
+
+            // set request body
+            return await SendRequest<T>(request);
+        }
+
+        public async Task<T?> DeleteContent<T>(string uri, object content)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Delete, uri);
+
+            // set request body
+            request.Content = new StringContent(JsonSerializer.Serialize(content), Encoding.UTF8, "application/json");
 
             // set request body
             return await SendRequest<T>(request);
@@ -63,10 +97,16 @@ namespace BlazorClient.Services
             }
 
             // send request
+            HttpResponseMessage? response = null;
             try
             {
-                using var response = await _httpClient.SendAsync(request);
-                return await response.Content.ReadFromJsonAsync<T>();
+                response = await _httpClient.SendAsync(request);
+                Console.WriteLine(await response.Content.ReadAsStringAsync());
+                if (response.IsSuccessStatusCode) 
+                { 
+                    return await response.Content.ReadFromJsonAsync<T>();
+                }
+                return default;
             }
             catch
             {

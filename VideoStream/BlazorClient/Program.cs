@@ -27,8 +27,11 @@ namespace BlazorClient
 			builder.Services.AddScoped<IVideoService, VideoService>();
 			builder.Services.AddScoped<IViewService, ViewService>();
 			builder.Services.AddScoped<ICommentService, CommentService>();
+			builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+			builder.Services.AddScoped<ISubscriberService, SubscriberService>();
+			builder.Services.AddScoped<IFileService, FileService>();
 
-			builder.Services
+            builder.Services
 				.AddBlazorise()
 				.AddFontAwesomeIcons()
 				.AddBootstrapProviders();

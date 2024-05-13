@@ -15,6 +15,11 @@ namespace BlazorClient.Services
             _userService = userService;
         }
 
+        public async Task<int> Count(Guid videoId)
+        {
+            return await _httpService.Get<int>("api/View/Count", "videoId", videoId);
+        }
+
         public async Task CreateView(Guid videoId)
         {
             UserData? user = await _userService.GetCurrent();

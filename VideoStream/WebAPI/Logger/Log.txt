@@ -1,0 +1,3 @@
+[5/13/2024 10:39:07 AM] [INFO] New item inserted in View Table
+[5/13/2024 10:39:09 AM] [INFO] New item inserted in Feedback Table
+[5/13/2024 10:39:12 AM] [INFO] New item inserted in View Table

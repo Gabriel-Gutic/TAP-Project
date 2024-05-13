@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using BusinessLayer.Services.Logger;
 
 
 namespace WebAPI
@@ -85,7 +86,7 @@ namespace WebAPI
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
             // Logger
-            builder.Services.AddScoped<IAppLogger, FileLogger>();
+            builder.Services.AddScoped<IAppLogger, AppLogger>();
 
             //Services
             builder.Services.AddScoped<IVideoSelector, RandomVideoSelector>();
@@ -96,7 +97,9 @@ namespace WebAPI
 			builder.Services.AddScoped<IVideoService, VideoService>();
 			builder.Services.AddScoped<ICommentService, CommentService>();
 			builder.Services.AddScoped<IViewService, ViewService>();
-			
+			builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+			builder.Services.AddScoped<ISubscriberService, SubscriberService>();
+
             // Scopes
             builder.Services.AddScoped<IFileManager, FileManager>();
 			builder.Services.AddScoped<IPasswordHandler, PasswordHandler>();

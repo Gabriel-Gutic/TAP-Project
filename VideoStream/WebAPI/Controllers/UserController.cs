@@ -8,6 +8,7 @@ using WebAPI.Dto;
 using WebAPI.File;
 using System.IO;
 using DataAccessLayer.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers
 {
@@ -17,11 +18,13 @@ namespace WebAPI.Controllers
 	{
 		private readonly IUserService _userService;
 		private readonly IFileManager _fileManager;
+		private readonly IAppLogger _logger;
 
-		public UserController(IUserService userService, IFileManager fileManager)
+		public UserController(IUserService userService, IFileManager fileManager, IAppLogger appLogger)
 		{
 			_userService = userService;
 			_fileManager = fileManager;
+			_logger = appLogger;
 		}
 
 		[HttpGet("GetAll")]
@@ -66,17 +69,40 @@ namespace WebAPI.Controllers
 			return Ok(userOut);
 		}
 
+		[HttpGet("IsUsernameValid")]
+		public IActionResult IsUsernameValid(string username)
+		{
+			if (_userService.IsUsernameUsed(username))
+			{
+				return Ok(false);
+			}
+
+			return Ok(true);
+		}
+
+        [HttpGet("IsEmailValid")]
+        public IActionResult IsEmailValid(string email)
+        {
+            if (_userService.IsEmailUsed(email))
+            {
+                return Ok(false);
+            }
+
+            return Ok(true);
+        }
+
+        [AllowAnonymous]
 		[HttpPost("Insert")]
 		public async Task<IActionResult> Insert(UserDtoInput userDtoInput)
 		{
-			string? imagePath = null;
+            string? imagePath = null;
 			try
 			{
                 imagePath = await _fileManager.ExtractImage(userDtoInput.Image);
 			}
 			catch (Exception ex)
 			{
-				return BadRequest(ex);
+                return BadRequest(ex.Message);
 			}
 
 			UserDto userDto = new UserDto(
@@ -84,10 +110,10 @@ namespace WebAPI.Controllers
 				userDtoInput.Email,
 				userDtoInput.Password,
 				imagePath,
-				userDtoInput.IsAdmin,
-				userDtoInput.IsActive
+				false,
+				true
 			);
-
+			
 			try
 			{
 				_userService.Insert(userDto);
@@ -121,8 +147,8 @@ namespace WebAPI.Controllers
 				userDtoInput.Email,
 				userDtoInput.Password,
 				imagePath,
-				userDtoInput.IsAdmin,
-				userDtoInput.IsActive
+				false,
+				true
 			);
 
 			try

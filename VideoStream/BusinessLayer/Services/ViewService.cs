@@ -77,5 +77,10 @@ namespace BusinessLayer.Services
 
 			_logger.Info("Item deleted from View Table");
 		}
-	}
+
+        public int Count(Guid videoId)
+        {
+            return _viewRepository.Count(v => v.VideoId == videoId);
+        }
+    }
 }

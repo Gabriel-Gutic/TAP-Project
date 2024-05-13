@@ -1,0 +1,91 @@
+﻿
+<table>
+    <tbody>
+        <tr>
+            <td>
+                <UserImage Id="@Id" Image="@Image"></UserImage>
+            </td>
+            <td>
+                <div class="align-middle">
+                    <h4 class="mt-1 ms-2 align-middle">@Username</h4>
+                </div>
+            </td>
+            <td>
+                @if (IsSubscriber)
+                {
+                    <button class="ms-2 btn btn-danger" @onclick="Unsubscribe">Unsubscribe</button>
+                }
+                else
+                {
+                    <button class="ms-2 btn btn-danger" @onclick="Subscribe">Subscribe</button>
+                }
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+@code
+{
+    @using Contracts
+    @using Data
+    @inject ISubscriberService SubscriberService
+    @inject IUserService UserService
+    @inject NavigationManager NavigationManager
+
+
+    [Parameter]
+    public Guid Id { get; set; }
+
+    [Parameter]
+    public string Username { get; set; }
+
+    [Parameter]
+    public string? Image { get; set; }
+
+    public UserData? CurrentUser { get; set; }
+
+    public bool IsSubscriber { get; set; }
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        CurrentUser = await UserService.GetCurrent();
+
+        if (CurrentUser != null)
+        {
+            IsSubscriber = await SubscriberService.IsSubscriber(CurrentUser.Id, Id);
+        }
+        else
+        {
+            IsSubscriber = false;
+        }
+    }
+
+    public async Task Subscribe()
+    {
+        CheckAccount(); 
+        if (CurrentUser.Id != Id)
+        {
+            await SubscriberService.Subscribe(CurrentUser.Id, Id);
+            NavigationManager.Refresh();
+        }
+    }
+
+    public async Task Unsubscribe()
+    {
+        CheckAccount();
+        if (CurrentUser.Id != Id)
+        {
+            await SubscriberService.Unsubscribe(CurrentUser.Id, Id);
+            NavigationManager.Refresh();
+        }
+    }
+
+    private void CheckAccount()
+    {
+        if (CurrentUser == null)
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+    }
+}

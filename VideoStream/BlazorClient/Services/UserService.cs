@@ -34,7 +34,7 @@ namespace BlazorClient.Services
 
         public async Task<UserData?> Get(Guid id)
         {
-            UserDto? userDto = await _httpService.Get<UserDto>("api/User/GetUser", "id", id);
+            UserDto? userDto = await _httpService.Get<UserDto>("api/User/Get", "id", id);
             if (userDto == null)
             {
                 return null;

@@ -123,5 +123,15 @@ namespace BusinessLayer.Services
 
 			_logger.Info("Item deleted from User Table");
 		}
+
+        public bool IsUsernameUsed(string username)
+        {
+            return _userRepository.Contains(u => u.Username == username);
+        }
+
+        public bool IsEmailUsed(string email)
+        {
+            return _userRepository.Contains(u => u.Email == email);
+        }
     }
 }

@@ -38,7 +38,13 @@ namespace WebAPI.Controllers
 			return Ok(view);
 		}
 
-		[HttpPost("Insert")]
+        [HttpGet("Count")]
+        public IActionResult Count(Guid videoId)
+        {
+            return Ok(_viewService.Count(videoId));
+        }
+
+        [HttpPost("Insert")]
 		public IActionResult Insert(ViewDtoInput viewDtoInput)
 		{
 			ViewDto viewDto = new ViewDto(
@@ -73,6 +79,7 @@ namespace WebAPI.Controllers
 				return BadRequest(ex.Message);
 			}
 		}
+
 		[HttpDelete("Delete")]
 		public IActionResult Delete(Guid id)
 		{

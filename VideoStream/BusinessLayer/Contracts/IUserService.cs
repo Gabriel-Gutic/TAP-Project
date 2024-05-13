@@ -1,4 +1,5 @@
 ﻿using BusinessLayer.Dto;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,10 @@ namespace BusinessLayer.Contracts
 
 		public UserDto? Get(Guid id);
 
-		public void Insert(UserDto userDto);
+		public bool IsUsernameUsed(string username);
+		public bool IsEmailUsed(string email);
+
+        public void Insert(UserDto userDto);
 
 		public void Update(Guid id, UserDto userDto);
 

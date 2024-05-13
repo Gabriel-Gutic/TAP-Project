@@ -1,0 +1,83 @@
+﻿@page "/register/{ErrorMessage?}"
+<h3>Register</h3>
+
+@if (ErrorMessage != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @ErrorMessage
+    </div>
+}
+
+<form @onsubmit="HandleSubmit" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" class="form-control" id="username" @bind="User.Username" required>
+    </div>
+    <br />
+    <div class="form-group">
+        <label for="email">Email</label>
+        <input type="text" class="form-control" id="email" @bind="User.Email" required>
+    </div>
+    <br />
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" id="password" @bind="User.Password" required>
+    </div>
+    <br />
+    <div class="form-group">
+        <label for="repet-password">Repet Password</label>
+        <input type="password" class="form-control" id="repet-password" @bind="User.RepetPassword" required>
+    </div>
+    <br />
+    <div class="form-group">
+        <label for="image">Profile Image</label>
+        <InputFile id="image" OnChange="@OnFileInput"></InputFile>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Register</button>
+</form>
+
+
+@code {
+    @using Dto;
+    @using Data;
+    @using Contracts;
+    @using System.Net.Http.Headers;
+    @inject IAuthService AuthService
+    @inject IFileService FileService
+
+    [Parameter]
+    public string? ErrorMessage { get; set; }
+
+    protected RegisterData User = new RegisterData();
+
+
+    protected async void HandleSubmit()
+    {
+        if (User.Password != User.RepetPassword)
+        {
+            ErrorMessage = "Passwords do not match!";
+            return;
+        }
+
+        await AuthService.Register(User);
+    }
+
+    protected async Task OnFileInput(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            User.ImageData = new FileUploadData()
+            {
+                Name = file.Name,
+                Stream = file.OpenReadStream(),
+                MediaType = new MediaTypeHeaderValue(file.ContentType),
+            };
+        }
+        else
+        {
+            User.ImageData = null;
+        }
+    }
+}
