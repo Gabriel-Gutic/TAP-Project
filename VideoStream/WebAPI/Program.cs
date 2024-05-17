@@ -8,7 +8,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
-using BusinessLayer.Services.Logger;
+using BusinessLayer.Notifications.Manager;
+using BusinessLayer.Logger;
+using BusinessLayer.Notifications.Factory;
+using BusinessLayer.RandomGenerator;
+using BusinessLayer.VideoSelector;
 
 
 namespace WebAPI
@@ -85,12 +89,15 @@ namespace WebAPI
             //Repository
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
+            // Random
+            builder.Services.AddScoped<IRandomGenerator, RandomGenerator>();
             // Logger
             builder.Services.AddScoped<IAppLogger, AppLogger>();
 
             //Services
-            builder.Services.AddScoped<IVideoSelector, RandomVideoSelector>();
-			
+            builder.Services.AddScoped<IVideoSelectorFactory, VideoSelectorFactory>();
+            builder.Services.AddScoped<IVideoSelectorService, VideoSelectorService>();
+
             builder.Services.AddScoped<IVideoCategoryService, VideoCategoryService>();
 			builder.Services.AddScoped<IUserService, UserService>();
 			builder.Services.AddScoped<IAuthService, AuthService>();
@@ -99,6 +106,10 @@ namespace WebAPI
 			builder.Services.AddScoped<IViewService, ViewService>();
 			builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 			builder.Services.AddScoped<ISubscriberService, SubscriberService>();
+			
+            builder.Services.AddScoped<INotificationService, NotificationService>();
+			builder.Services.AddScoped<INotificationFactory, NotificationFactory>();
+            builder.Services.AddScoped<INotificationManager, NotificationManager>();
 
             // Scopes
             builder.Services.AddScoped<IFileManager, FileManager>();

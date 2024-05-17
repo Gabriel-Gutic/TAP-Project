@@ -1,6 +1,7 @@
 ﻿using BusinessLayer.Contracts;
 using BusinessLayer.Dto;
 using BusinessLayer.Exceptions;
+using BusinessLayer.Logger;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repository;
 using Microsoft.IdentityModel.Tokens;

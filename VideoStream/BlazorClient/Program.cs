@@ -1,4 +1,5 @@
 using BlazorClient.Contracts;
+using BlazorClient.Events;
 using BlazorClient.Services;
 using Blazorise;
 using Blazorise.Bootstrap;
@@ -25,11 +26,15 @@ namespace BlazorClient
 			builder.Services.AddScoped<IUserService, UserService>();
 			builder.Services.AddScoped<IAuthService, AuthService>();
 			builder.Services.AddScoped<IVideoService, VideoService>();
-			builder.Services.AddScoped<IViewService, ViewService>();
+			builder.Services.AddScoped<IVideoCategoryService, VideoCategoryService>();
+            builder.Services.AddScoped<IViewService, ViewService>();
 			builder.Services.AddScoped<ICommentService, CommentService>();
 			builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 			builder.Services.AddScoped<ISubscriberService, SubscriberService>();
 			builder.Services.AddScoped<IFileService, FileService>();
+
+			builder.Services.AddSingleton<IEventSetup, EventSetup>();
+			builder.Services.AddSingleton<IEventController, EventController>();
 
             builder.Services
 				.AddBlazorise()

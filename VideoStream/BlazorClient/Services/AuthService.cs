@@ -3,23 +3,27 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Net.Http.Headers;
 using BlazorClient.Dto;
 using BlazorClient.Data;
+using System.Text;
+using System.Net.Http.Json;
+using BlazorClient.MultipartAdapter;
 
 namespace BlazorClient.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly HttpClient _httpClient;
         private readonly IHttpService _httpService;
         private readonly NavigationManager _navigationManager;
         private readonly ILocalStorageService _localStorageService;
+        private readonly IMultipartAdapter _multipartAdapter;
 
 
-        public AuthService(HttpClient httpClient, IHttpService httpService, NavigationManager navigationManager, ILocalStorageService localStorageService)
+        public AuthService(IHttpService httpService, NavigationManager navigationManager, ILocalStorageService localStorageService)
         {
-            _httpClient = httpClient;
             _httpService = httpService;
             _navigationManager = navigationManager;
             _localStorageService = localStorageService;
+
+            _multipartAdapter = new RegisterAdapter();
         }
 
         public async Task Register(RegisterData register)
@@ -45,21 +49,8 @@ namespace BlazorClient.Services
                     throw new Exception("Email already used!");
                 }
 
-                var content = new MultipartFormDataContent();
-                content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("form-data");
-                if (register.ImageData != null)
-                {
-                    var file = new StreamContent(register.ImageData.Stream);
-                    file.Headers.ContentType = register.ImageData.MediaType;
-                    content.Add(file, "Image", register.ImageData.Name);
-                }
-                
-                content.Add(new StringContent(register.Username), "Username");
-                content.Add(new StringContent(register.Email), "Email");
-                content.Add(new StringContent(register.Password), "Password");
-
-                var response = await _httpService.Post<string>("api/User/Insert", content);
-                if (response != null)
+                var success = await _httpService.PostMultipart("api/User/Insert", _multipartAdapter.Adapt(register));
+                if (success)
                 {
                     var token = await _httpService.Post<TokenDto>("api/Auth/Token", new AuthDto(register.Username, register.Password));
 

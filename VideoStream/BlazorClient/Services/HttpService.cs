@@ -4,6 +4,8 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text;
 using BlazorClient.Dto;
+using BlazorClient.Pages.AuthPages;
+using Microsoft.AspNetCore.Components;
 
 namespace BlazorClient.Services
 {
@@ -101,9 +103,8 @@ namespace BlazorClient.Services
             try
             {
                 response = await _httpClient.SendAsync(request);
-                Console.WriteLine(await response.Content.ReadAsStringAsync());
                 if (response.IsSuccessStatusCode) 
-                { 
+                {
                     return await response.Content.ReadFromJsonAsync<T>();
                 }
                 return default;
@@ -111,6 +112,20 @@ namespace BlazorClient.Services
             catch
             {
                 return default;
+            }
+        }
+
+        public async Task<bool> PostMultipart(string uri, MultipartFormDataContent content)
+        {
+            HttpResponseMessage? response = null;
+            try
+            {
+                response = await _httpClient.PostAsync(uri, content);
+                return response.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
             }
         }
     }

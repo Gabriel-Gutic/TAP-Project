@@ -55,6 +55,13 @@ namespace WebAPI.Controllers
             return Ok(_subscriberService.Count(creatorId));
         }
 
+        [HttpGet("GetSubscribers")]
+        public IActionResult GetSubscribers(Guid creatorId)
+        {
+            var entities = _subscriberService.GetSubscribers(creatorId);
+            return Ok(entities);
+        }
+
         [HttpPost("Subscribe")]
         public IActionResult Subscribe(SubscriberDtoInput subscriberDtoInput)
         {

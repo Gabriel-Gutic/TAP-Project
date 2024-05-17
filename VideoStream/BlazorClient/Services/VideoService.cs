@@ -1,8 +1,12 @@
 ﻿using BlazorClient.Contracts;
 using BlazorClient.Data;
 using BlazorClient.Dto;
+using BlazorClient.Events;
+using BlazorClient.MultipartAdapter;
+using BlazorClient.Pages.AuthPages;
 using Blazorise;
 using Microsoft.AspNetCore.Components;
+using System.Net.Http;
 using System.Net.Http.Json;
 
 namespace BlazorClient.Services
@@ -15,8 +19,11 @@ namespace BlazorClient.Services
         private readonly IFeedbackService _feedbackService;
         private readonly IViewService _viewService;
         private readonly ISubscriberService _subscriberService;
+        private readonly IMultipartAdapter _multipartAdapter;
 
-        public VideoService(IHttpService httpService, IUserService userService,  NavigationManager navigationManager, IFeedbackService feedbackService, IViewService viewService, ISubscriberService subscriberService)
+        private readonly IEventController _eventController; 
+
+        public VideoService(IHttpService httpService, IUserService userService,  NavigationManager navigationManager, IFeedbackService feedbackService, IViewService viewService, ISubscriberService subscriberService, IEventController eventController)
         {
             _httpService = httpService;
             _userService = userService;
@@ -24,6 +31,9 @@ namespace BlazorClient.Services
             _feedbackService = feedbackService;
             _viewService = viewService;
             _subscriberService = subscriberService;
+            _eventController = eventController;
+
+            _multipartAdapter = new VideoUploadAdapter();
         }
 
         public async Task<VideoData?> GetVideo(string stringId)
@@ -120,5 +130,33 @@ namespace BlazorClient.Services
 
             return null;
         }
-    }
+
+		public async Task UploadVideo(VideoUploadData data)
+		{
+            string? errorMessage = null;
+
+            try
+            {
+                var success = await _httpService.PostMultipart("api/Video/Insert", _multipartAdapter.Adapt(data));
+                if (success)
+                {
+                    if (data.IsPublic)
+                    {
+                        await _eventController.Invoke("VideoUpload", new { CreatorId = data.UserId });
+                    }
+                    _navigationManager.NavigateTo($"/", true);
+                }
+                else
+                {
+                    throw new Exception("An error occured. Try again.");
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = ex.Message;
+            }
+
+            _navigationManager.NavigateTo($"/videoupload/{errorMessage}");
+        }
+	}
 }

@@ -8,5 +8,6 @@ namespace BlazorClient.Contracts
     {
         public Task<IEnumerable<VideoCardData>?> SelectForUser();
         public Task<VideoData?> GetVideo(string id);
+        public Task UploadVideo(VideoUploadData data);
     }
 }

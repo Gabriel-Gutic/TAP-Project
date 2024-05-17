@@ -9,5 +9,6 @@
         public Task<T?> Patch<T>(string uri, object content);
         public Task<T?> Delete<T>(string uri, Guid id);
         public Task<T?> DeleteContent<T>(string uri, object content);
+        public Task<bool> PostMultipart(string uri, MultipartFormDataContent content);
     }
 }

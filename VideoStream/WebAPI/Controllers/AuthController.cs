@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Contracts;
 using BusinessLayer.Dto;
+using BusinessLayer.Logger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;

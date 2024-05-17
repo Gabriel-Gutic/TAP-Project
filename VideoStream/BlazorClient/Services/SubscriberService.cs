@@ -1,4 +1,5 @@
 ﻿using BlazorClient.Contracts;
+using BlazorClient.Events;
 
 namespace BlazorClient.Services
 {
@@ -6,11 +7,13 @@ namespace BlazorClient.Services
     {
         private readonly IHttpService _httpService;
         private readonly IUserService _userService;
+        private readonly IEventController _eventController;
 
-        public SubscriberService(IHttpService httpService, IUserService userService)
+        public SubscriberService(IHttpService httpService, IUserService userService, IEventController eventController)
         {
             _httpService = httpService;
             _userService = userService;
+            _eventController = eventController;
         }
 
         public async Task<int> Count(Guid creatorId)
@@ -45,11 +48,13 @@ namespace BlazorClient.Services
         {
             try
             {
-                await _httpService.Post<string>("api/Subscriber/Subscribe", new
+                var data = new
                 {
                     CreatorId = creatorId,
                     SubscriberId = subscriberId,
-                });
+                };
+                await _httpService.Post<string>("api/Subscriber/Subscribe", data);
+                await _eventController.Invoke("Subscribe", data);
             }
             catch
             {

@@ -9,10 +9,11 @@ using WebAPI.File;
 using System.IO;
 using DataAccessLayer.Models;
 using Microsoft.AspNetCore.Authorization;
+using BusinessLayer.Logger;
 
 namespace WebAPI.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class UserController : ControllerBase
 	{
@@ -93,7 +94,7 @@ namespace WebAPI.Controllers
 
         [AllowAnonymous]
 		[HttpPost("Insert")]
-		public async Task<IActionResult> Insert(UserDtoInput userDtoInput)
+		public async Task<IActionResult> Insert([FromForm]UserDtoInput userDtoInput)
 		{
             string? imagePath = null;
 			try
@@ -130,7 +131,7 @@ namespace WebAPI.Controllers
 		}
 
 		[HttpPut("Update")]
-		public async Task<IActionResult> Update(Guid id, UserDtoInput userDtoInput)
+		public async Task<IActionResult> Update(Guid id, [FromForm]UserDtoInput userDtoInput)
 		{
             string? imagePath = null;
             try

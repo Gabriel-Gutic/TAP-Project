@@ -1,4 +1,7 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using BlazorClient.Contracts;
+using BlazorClient.Pages.AuthPages;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 
 namespace BlazorClient.Data
 {

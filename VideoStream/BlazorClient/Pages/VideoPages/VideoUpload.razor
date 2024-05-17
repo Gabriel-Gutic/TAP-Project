@@ -1,0 +1,119 @@
+﻿@page "/videoupload/{ErrorMessage?}"
+
+<PageTitle>Upload Video</PageTitle>
+
+@if (ErrorMessage != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @ErrorMessage
+    </div>
+}
+
+<form @onsubmit="Upload" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" class="form-control" id="title" @bind="Video.Title" required>
+    </div>
+    <br />
+    <div class="form-group">
+        <label for="description">Description</label>
+        <textarea @bind=@(Video.Description) class="form-control" id="description" rows="3"></textarea>
+    </div>
+    <br />
+    <div id="visibility">
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="videoVisibility" id="videoVisibilityPublic" 
+                checked="@(Video.IsPublic == true)" 
+                @onchange="@(() => Video.IsPublic = true)">
+            <label class="form-check-label" for="videoVisibilityPublic">
+                Public
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="videoVisibility" id="videoVisibilityPrivate" 
+                checked="@(Video.IsPublic == false)"
+                @onchange="@(() => Video.IsPublic = false)">
+            <label class="form-check-label" for="videoVisibilityPrivate">
+                Private
+            </label>
+        </div>
+    </div>
+    <br />
+    <div class="form-group">
+        <label for="thumbnail">Thumbnail</label>
+        <InputFile id="thumbnail" OnChange="@OnThumbnailInput" required></InputFile>
+    </div>
+    <br />
+    <div class="form-group">
+        <label for="video">Video</label>
+        <InputFile id="video" OnChange="@OnVideoInput" required></InputFile>
+    </div>
+    <br />
+    @if (Categories != null)
+    {
+        <select class="form-select" @bind=@(Video.CategoryId) required>
+            @foreach (var category in Categories)
+            {
+                <option value="@category.Id">@category.Name</option>
+            }
+        </select>
+    }
+    <br />
+    <button type="submit" class="btn btn-primary">Upload</button>
+</form>
+
+
+@code
+{
+@using Data
+@using Contracts
+@inject IUserService UserService
+@inject IVideoService VideoService
+@inject IVideoCategoryService VideoCategoryService
+@inject NavigationManager NavigationManager
+
+	protected UserData? CurrentUser { get; set; }
+
+    [Parameter]
+    public string? ErrorMessage { get; set; }
+
+    protected VideoUploadData Video = new VideoUploadData();
+
+    protected IEnumerable<VideoCategoryData>? Categories { get; set; }
+
+	protected override async Task OnParametersSetAsync()
+	{
+		CurrentUser = await UserService.GetCurrent();
+		if (CurrentUser == null)
+		{
+			string error = "You need to be logged in to upload a video";
+			NavigationManager.NavigateTo($"/login/{error}", true);
+		}
+
+        Video.UserId = CurrentUser.Id;
+
+        Categories = await VideoCategoryService.GetAll();
+        if (Categories == null)
+        {
+            string error = "An error occured while trying to load the upload page";
+            NavigationManager.NavigateTo($"/{error}", true);
+        }
+
+        Video.CategoryId = Categories.First().Id;
+    }
+
+    public async Task Upload()
+    {
+        await VideoService.UploadVideo(Video);
+    }
+
+    public void OnThumbnailInput(InputFileChangeEventArgs e)
+    {
+        Video.ImageData = e.File == null ? null : new FileUploadData(e.File);
+    }
+
+    public void OnVideoInput(InputFileChangeEventArgs e)
+    {
+        Video.VideoData = e.File == null ? null : new FileUploadData(e.File);
+    }
+}

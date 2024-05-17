@@ -1,6 +1,7 @@
 ﻿using BusinessLayer.Contracts;
 using BusinessLayer.Dto;
 using BusinessLayer.Exceptions;
+using BusinessLayer.Logger;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repository;
 using System;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.Services
 {
-	public class UserService : IUserService
+    public class UserService : IUserService
 	{
 		private readonly IRepository<User> _userRepository;
 		private readonly IAppLogger _logger;
@@ -132,6 +133,25 @@ namespace BusinessLayer.Services
         public bool IsEmailUsed(string email)
         {
             return _userRepository.Contains(u => u.Email == email);
+        }
+
+        public UserDto? Get(string username)
+        {
+            var user = _userRepository.Find(u => u.Username == username).FirstOrDefault();
+            if (user == null)
+            {
+                return null;
+            }
+            return new UserDto(
+                user.Id,
+                user.Username,
+                user.Email,
+                user.Password,
+                user.ImagePath,
+                user.IsAdmin,
+                user.IsActive,
+                user.CreatedAt
+            );
         }
     }
 }

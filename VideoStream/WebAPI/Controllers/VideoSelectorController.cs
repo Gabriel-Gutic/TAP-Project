@@ -8,10 +8,10 @@ namespace WebAPI.Controllers
 	[ApiController]
 	public class VideoSelectorController : ControllerBase
 	{
-		private readonly IVideoSelector _videoSelector;
+		private readonly IVideoSelectorService _videoSelector;
 		private readonly int _videoCount;
 
-		public VideoSelectorController(IVideoSelector videoSelector)
+		public VideoSelectorController(IVideoSelectorService videoSelector)
 		{
 			_videoSelector = videoSelector;
 			_videoCount = 20;

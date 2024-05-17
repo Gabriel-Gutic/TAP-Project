@@ -70,7 +70,7 @@ namespace WebAPI.Controllers
 		}
 
 		[HttpPost("Insert")]
-		public async Task<IActionResult> Insert(VideoDtoInput videoDtoInput)
+		public async Task<IActionResult> Insert([FromForm]VideoDtoInput videoDtoInput)
 		{
 			string[] paths;
 			try
@@ -101,7 +101,7 @@ namespace WebAPI.Controllers
 		}
 
 		[HttpPut("Update")]
-		public async Task<IActionResult> Update(Guid id, VideoDtoInput videoDtoInput)
+		public async Task<IActionResult> Update(Guid id, [FromForm]VideoDtoInput videoDtoInput)
 		{
             string[] paths;
             try

@@ -17,6 +17,8 @@ namespace BusinessLayer.Contracts
 
         public int Count(Guid creatorId);
 
+        public IEnumerable<SubscriberDto> GetSubscribers(Guid creatorId);
+
         public bool IsSubscriber(Guid creatorId, Guid subscriberId);
 
         public void Subscribe(Guid creatorId, Guid subscriberId);

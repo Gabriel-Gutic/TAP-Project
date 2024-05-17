@@ -1,5 +1,6 @@
 ﻿@using Blazorise
 @using BlazorClient.Components
+@using BlazorClient.Icons
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -22,11 +23,9 @@
                     }
                     else
                     {
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
-                            <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-                        </svg>
+                        <UserIcon Size="32"></UserIcon>
                     }
-                    <h4 class="mt-1 ms-2">
+                    <h4 class="mt-1 ms-3">
                         @CurrentUser.Username
                     </h4>
                 </NavLink>
@@ -41,27 +40,29 @@
         {
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="login">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
-                        <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-                    </svg> Login
+                    <UserIcon></UserIcon>
+                    <div class="ms-3">Login</div>
                 </NavLink>
             </div>
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="register">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
-                        <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-                    </svg> Register
+                    <UserIcon></UserIcon>
+                    <div class="ms-3">Register</div>
                 </NavLink>
             </div>
         }
         else
         {
             <div class="nav-item px-3">
+                <NavLink class="nav-link" href="videoupload">
+                    <UploadIcon></UploadIcon>
+                    <div class="ms-3">Upload Video</div>
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
                 <NavLink class="nav-link" href="logout">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
-                        <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-                    </svg> 
-                    Logout
+                    <UserIcon></UserIcon>
+                    <div class="ms-3">Logout</div>
                 </NavLink>
             </div>
         }

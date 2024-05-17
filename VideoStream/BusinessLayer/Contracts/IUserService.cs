@@ -13,8 +13,9 @@ namespace BusinessLayer.Contracts
 		public IEnumerable<UserDto> GetAll();
 
 		public UserDto? Get(Guid id);
+		public UserDto? Get(string username);
 
-		public bool IsUsernameUsed(string username);
+        public bool IsUsernameUsed(string username);
 		public bool IsEmailUsed(string email);
 
         public void Insert(UserDto userDto);

@@ -13,11 +13,11 @@
             <td>
                 @if (IsSubscriber)
                 {
-                    <button class="ms-2 btn btn-danger" @onclick="Unsubscribe">Unsubscribe</button>
+                    <button class="ms-2 btn btn-danger" @onclick="Unsubscribe">Unsubscribe (@SubscriberCount)</button>
                 }
                 else
                 {
-                    <button class="ms-2 btn btn-danger" @onclick="Subscribe">Subscribe</button>
+                    <button class="ms-2 btn btn-danger" @onclick="Subscribe">Subscribe (@SubscriberCount)</button>
                 }
             </td>
         </tr>
@@ -28,6 +28,7 @@
 {
     @using Contracts
     @using Data
+    @using Events
     @inject ISubscriberService SubscriberService
     @inject IUserService UserService
     @inject NavigationManager NavigationManager
@@ -42,10 +43,11 @@
     [Parameter]
     public string? Image { get; set; }
 
-    public UserData? CurrentUser { get; set; }
+    protected UserData? CurrentUser { get; set; }
 
-    public bool IsSubscriber { get; set; }
+    protected bool IsSubscriber { get; set; }
 
+    protected int SubscriberCount { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -53,12 +55,14 @@
 
         if (CurrentUser != null)
         {
-            IsSubscriber = await SubscriberService.IsSubscriber(CurrentUser.Id, Id);
+            IsSubscriber = await SubscriberService.IsSubscriber(Id, CurrentUser.Id);
         }
         else
         {
             IsSubscriber = false;
         }
+
+        SubscriberCount = await SubscriberService.Count(Id);
     }
 
     public async Task Subscribe()
@@ -66,8 +70,13 @@
         CheckAccount(); 
         if (CurrentUser.Id != Id)
         {
-            await SubscriberService.Subscribe(CurrentUser.Id, Id);
-            NavigationManager.Refresh();
+            await SubscriberService.Subscribe(Id, CurrentUser.Id);
+
+            // Dynamic invocation
+            var type = typeof(NavigationManager);
+            var refreshMethod = type.GetMethod("Refresh");
+
+            refreshMethod.Invoke(NavigationManager, new object[]{ true });
         }
     }
 
@@ -76,7 +85,7 @@
         CheckAccount();
         if (CurrentUser.Id != Id)
         {
-            await SubscriberService.Unsubscribe(CurrentUser.Id, Id);
+            await SubscriberService.Unsubscribe(Id, CurrentUser.Id);
             NavigationManager.Refresh();
         }
     }

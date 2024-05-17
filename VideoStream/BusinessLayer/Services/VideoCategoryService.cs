@@ -1,6 +1,7 @@
 ﻿using BusinessLayer.Contracts;
 using BusinessLayer.Dto;
 using BusinessLayer.Exceptions;
+using BusinessLayer.Logger;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repository;
 using System;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.Services
 {
-	public class VideoCategoryService : IVideoCategoryService
+    public class VideoCategoryService : IVideoCategoryService
 	{
 		private readonly IRepository<VideoCategory> _videoCategoryRepository;
 		private readonly IAppLogger _logger;

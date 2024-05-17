@@ -1,7 +1,7 @@
 ﻿using BusinessLayer.Contracts;
 using BusinessLayer.Dto;
 using BusinessLayer.Exceptions;
-using BusinessLayer.Objects;
+using BusinessLayer.Logger;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repository;
 using System;
@@ -127,6 +127,23 @@ namespace BusinessLayer.Services
             _subscriberRepository.SaveChanges();
 
             _logger.Info("Subscriber deleted");
+        }
+
+        public IEnumerable<SubscriberDto> GetSubscribers(Guid creatorId)
+        {
+            IEnumerable<SubscriberDto> subscribers =
+                from subscriber in _subscriberRepository.GetAll()
+                where subscriber.CreatorUserId == creatorId
+                join creator in _userRepository.GetAll() on subscriber.CreatorUserId equals creator.Id
+                join follower in _userRepository.GetAll() on subscriber.SubscriberUserId equals follower.Id
+                select new SubscriberDto()
+                {
+                    CreatorId = creator.Id,
+                    CreatorUsername = creator.Username,
+                    SubscriberId = follower.Id,
+                    SubscriberUsername = follower.Username,
+                };
+            return subscribers;
         }
     }
 }
