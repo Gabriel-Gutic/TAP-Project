@@ -10,6 +10,11 @@ and can leave feedback and comments.
 
 To run the project you must setup your sql conection in MyDbContext.cs file:
 ```
+private readonly string _windowsConnectionString = @"Server=localhost\SQLEXPRESS;Database=TAPProject;Trusted_Connection=True;TrustServerCertificate=True;";
+```
+
+Then you need to apply all the migrations with this command:
+```
 dotnet ef database update --proj "your_project_path"
 ```
 
