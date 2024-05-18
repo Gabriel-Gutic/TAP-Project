@@ -220,3 +220,38 @@
 [5/17/2024 8:40:48 AM] [INFO] New item inserted in Notification Table
 [5/17/2024 8:40:48 AM] [INFO] New item inserted in Notification Table
 [5/17/2024 8:41:02 AM] [INFO] New item inserted in View Table
+[5/17/2024 8:46:32 AM] [INFO] New item inserted in Video Table
+[5/17/2024 1:11:27 PM] [INFO] Username: 
+[5/17/2024 1:24:43 PM] [INFO] Select Works
+[5/17/2024 1:26:48 PM] [INFO] Video Count: 11
+[5/17/2024 1:55:52 PM] [INFO] New item inserted in Video Table
+[5/17/2024 1:55:52 PM] [INFO] New item inserted in Notification Table
+[5/17/2024 1:55:52 PM] [INFO] New item inserted in Notification Table
+[5/17/2024 1:55:52 PM] [INFO] New item inserted in Notification Table
+[5/17/2024 1:55:52 PM] [INFO] New item inserted in Notification Table
+[5/17/2024 1:55:52 PM] [INFO] New item inserted in Notification Table
+[5/17/2024 2:02:30 PM] [INFO] New item inserted in Video Table
+[5/17/2024 11:18:49 PM] [INFO] New item inserted in View Table
+[5/17/2024 11:18:54 PM] [INFO] New item inserted in View Table
+[5/17/2024 11:18:58 PM] [INFO] New item inserted in View Table
+[5/17/2024 11:19:03 PM] [INFO] New item inserted in View Table
+[5/17/2024 11:19:10 PM] [INFO] New item inserted in View Table
+[5/17/2024 11:34:02 PM] [INFO] New item inserted in View Table
+[5/17/2024 11:34:06 PM] [INFO] New item inserted in View Table
+[5/17/2024 11:34:10 PM] [INFO] New item inserted in View Table
+[5/17/2024 11:34:15 PM] [INFO] New item inserted in View Table
+[5/17/2024 11:34:19 PM] [INFO] New item inserted in View Table
+[5/17/2024 11:34:24 PM] [INFO] New item inserted in View Table
+[5/18/2024 5:50:04 PM] [INFO] New item inserted in View Table
+[5/18/2024 5:50:18 PM] [INFO] Subscriber deleted
+[5/18/2024 5:50:22 PM] [INFO] New subscriber
+[5/18/2024 5:50:22 PM] [INFO] New item inserted in Notification Table
+[5/18/2024 7:33:00 PM] [INFO] Item deleted from Video Table
+[5/18/2024 7:33:30 PM] [INFO] Item deleted from Video Table
+[5/18/2024 8:07:36 PM] [INFO] New item inserted in Video Table
+[5/18/2024 8:14:31 PM] [INFO] Item edited in Video Table
+[5/18/2024 8:23:10 PM] [INFO] Item edited in Video Table
+[5/18/2024 8:32:19 PM] [INFO] Item edited in Video Table
+[5/18/2024 8:32:32 PM] [INFO] Item edited in Video Table
+[5/18/2024 8:32:50 PM] [INFO] Item edited in Video Table
+[5/18/2024 8:33:03 PM] [INFO] Item deleted from Video Table

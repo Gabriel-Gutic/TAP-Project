@@ -19,6 +19,7 @@ namespace WebAPI.Controllers
 			_videoCategoryService = videoCategoryService;
 		}
 
+		// Get information about each category
 		[HttpGet("GetAll")]
 		public IActionResult GetAll()
 		{
@@ -26,7 +27,8 @@ namespace WebAPI.Controllers
 			return Ok(entities);
 		}
 
-		[HttpGet("Get")]
+        // Get information about a specific category
+        [HttpGet("Get")]
 		public IActionResult Get(Guid id)
 		{
 			var videoCategory = _videoCategoryService.Get(id);
@@ -38,8 +40,9 @@ namespace WebAPI.Controllers
 			return Ok(videoCategory);
 		}
 
+        // Insert a new category in the database
 		[HttpPost("Insert")]
-		public IActionResult Insert(VideoCategoryDtoInput videoCategoryDtoInput)
+        public IActionResult Insert(VideoCategoryDtoInput videoCategoryDtoInput)
 		{
 			VideoCategoryDto videoCategoryDto = new VideoCategoryDto(videoCategoryDtoInput.Name);
 
@@ -48,8 +51,10 @@ namespace WebAPI.Controllers
 			return Ok("Video Category successfully inserted");
 		}
 
-		[HttpPut("Update")]
-		public IActionResult Update(Guid id, VideoCategoryDtoInput videoCategoryDtoInput)
+        // Update an existing category
+        // BadRequest if the category doesn't exist 
+        [HttpPut("Update")]
+        public IActionResult Update(Guid id, VideoCategoryDtoInput videoCategoryDtoInput)
 		{
 			try
 			{
@@ -67,7 +72,10 @@ namespace WebAPI.Controllers
 				return BadRequest(ex.Message);
 			}
 		}
-		[HttpDelete("Delete")]
+
+        // Delete an existing category
+        // BadRequest if the category doesn't exist 
+        [HttpDelete("Delete")]
 		public IActionResult Delete(Guid id)
 		{
 			try

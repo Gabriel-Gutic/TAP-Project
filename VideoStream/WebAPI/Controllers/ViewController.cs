@@ -1,8 +1,6 @@
 ﻿using BusinessLayer.Contracts;
 using BusinessLayer.Dto;
 using BusinessLayer.Exceptions;
-using BusinessLayer.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Dto;
 
@@ -13,12 +11,15 @@ namespace WebAPI.Controllers
 	public class ViewController : ControllerBase
 	{
 		private readonly IViewService _viewService;
+		private readonly IAppCache _appCache;
 
-		public ViewController(IViewService viewService)
+		public ViewController(IViewService viewService, IAppCache appCache)
 		{
 			_viewService = viewService;
+			_appCache = appCache;
 		}
 
+		// Get information about each view
 		[HttpGet("GetAll")]
 		public IActionResult GetAll()
 		{
@@ -26,8 +27,9 @@ namespace WebAPI.Controllers
 			return Ok(entities);
 		}
 
+		// Get information about a specific view
 		[HttpGet("Get")]
-		public IActionResult Get(Guid id)
+        public IActionResult Get(Guid id)
 		{
 			var view = _viewService.Get(id);
 
@@ -38,12 +40,28 @@ namespace WebAPI.Controllers
 			return Ok(view);
 		}
 
+        // Get the view count for a specific video.
+		// This function is using cache, the count will be 
+		// up to date at each 20 seconds
+        // Cache
         [HttpGet("Count")]
         public IActionResult Count(Guid videoId)
         {
-            return Ok(_viewService.Count(videoId));
+            string cacheKey = "views-" + videoId;
+
+            if (_appCache.TryGet(cacheKey, out object? cache))
+            {
+				return Ok(cache);
+            }
+
+			int count = _viewService.Count(videoId);
+
+            _appCache.Store(cacheKey, count, 20);
+
+            return Ok(count);
         }
 
+		// Insert a new view in the database
         [HttpPost("Insert")]
 		public IActionResult Insert(ViewDtoInput viewDtoInput)
 		{
@@ -57,6 +75,8 @@ namespace WebAPI.Controllers
 			return Ok("View successfully inserted");
 		}
 
+        // Update an existing view
+        // BadRequest if the view doesn't exist 
         [HttpPut("Update")]
 		public IActionResult Update(Guid id, ViewDtoInput viewDtoInput)
 		{
@@ -80,7 +100,9 @@ namespace WebAPI.Controllers
 			}
 		}
 
-		[HttpDelete("Delete")]
+        // Remove an existing view
+        // BadRequest if the view doesn't exist 
+        [HttpDelete("Delete")]
 		public IActionResult Delete(Guid id)
 		{
 			try

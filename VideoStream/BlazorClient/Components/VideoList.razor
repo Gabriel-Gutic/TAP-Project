@@ -1,0 +1,30 @@
+﻿<style>
+    .wrapper {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+    }
+</style>
+
+<div class="wrapper">
+    @foreach (var video in Videos)
+    {
+        <div class="me-2 mb-4">
+            <VideoCard Id="@video.Id"
+                       Title="@video.Title"
+                       Image="@video.ImagePath"
+                       Creator="@video.Creator"
+                       IsForEditing="@IsForEditing">
+            </VideoCard>
+        </div>
+    }
+</div>
+
+@code {
+@using Data;
+    [Parameter]
+    public IEnumerable<VideoCardData> Videos { get; set; }
+
+    [Parameter]
+    public bool IsForEditing { get; set; } = false;
+}

@@ -13,6 +13,11 @@ using BusinessLayer.Logger;
 using BusinessLayer.Notifications.Factory;
 using BusinessLayer.RandomGenerator;
 using BusinessLayer.VideoSelector;
+using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using AspNetCoreRateLimit;
 
 
 namespace WebAPI
@@ -37,6 +42,18 @@ namespace WebAPI
 
             builder.Services.AddControllers();
 
+            builder.Services.AddApiVersioning(options =>
+            {
+                options.DefaultApiVersion = new ApiVersion(2, 0);
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.ReportApiVersions = true;
+            })
+            .AddApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'VVV";
+                options.SubstituteApiVersionInUrl = true;
+            });
+
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -56,6 +73,12 @@ namespace WebAPI
                 };
             });
             builder.Services.AddAuthorization();
+
+            builder.Services.AddMemoryCache();
+
+            builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
+            builder.Services.AddInMemoryRateLimiting();
+            builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -106,7 +129,8 @@ namespace WebAPI
 			builder.Services.AddScoped<IViewService, ViewService>();
 			builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 			builder.Services.AddScoped<ISubscriberService, SubscriberService>();
-			
+			builder.Services.AddScoped<IAppCache, AppCache>();
+
             builder.Services.AddScoped<INotificationService, NotificationService>();
 			builder.Services.AddScoped<INotificationFactory, NotificationFactory>();
             builder.Services.AddScoped<INotificationManager, NotificationManager>();
@@ -118,13 +142,23 @@ namespace WebAPI
 			//Database
 			builder.Services.AddDbContext<MyDbContext>();
 
+            builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(
+                    options =>
+                    {
+                        var descriptions = app.DescribeApiVersions();
+                        foreach (var description in descriptions)
+                        {
+                            options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+                        }
+                    });
             }
 
             app.UseHttpsRedirection();
@@ -133,6 +167,7 @@ namespace WebAPI
             app.UseAuthorization();
             app.UseCors("Default");
             app.UseStaticFiles();
+            app.UseIpRateLimiting();
 
             app.MapControllers();
 

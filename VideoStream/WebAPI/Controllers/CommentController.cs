@@ -18,6 +18,7 @@ namespace WebAPI.Controllers
             _commentService = commentService;
         }
 
+        // Get information about all the comments
         [HttpGet("GetAll")]
         public IActionResult GetAll()
         {
@@ -25,6 +26,7 @@ namespace WebAPI.Controllers
             return Ok(entities);
         }
 
+        // Get information about a specific comment
         [HttpGet("Get")]
         public IActionResult Get(Guid id)
         {
@@ -37,6 +39,7 @@ namespace WebAPI.Controllers
             return Ok(comment);
         }
 
+        // Get all comments for a specific video
         [HttpGet("GetForVideo")]
         public IActionResult GetForVideo(Guid videoId)
         {
@@ -44,6 +47,7 @@ namespace WebAPI.Controllers
             return Ok(entities);
         }
 
+        // Insert a new comment in the database
         [HttpPost("Insert")]
         public IActionResult Insert(CommentDtoInput commentDtoInput)
         {
@@ -59,6 +63,8 @@ namespace WebAPI.Controllers
             return Ok("View successfully inserted");
         }
 
+        // Update an existing comment
+        // BadRequest if the comment doesn't exist 
         [HttpPut("Update")]
         public IActionResult Update(Guid id, CommentDtoInput commentDtoInput)
         {
@@ -84,6 +90,7 @@ namespace WebAPI.Controllers
             }
         }
 
+        // Delete a comment from the database
         [HttpDelete("Delete")]
         public IActionResult Delete(Guid id)
         {

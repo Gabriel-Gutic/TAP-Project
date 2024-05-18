@@ -1,6 +1,7 @@
 ﻿using BusinessLayer.Contracts;
 using BusinessLayer.Dto;
 using BusinessLayer.Exceptions;
+using BusinessLayer.Logger;
 using BusinessLayer.VideoSelector;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repository;
@@ -36,7 +37,7 @@ namespace BusinessLayer.Services
             return _videoSelector.Select(user, count);
         }
 
-        public IEnumerable<VideoDto> SelectForUser(string username, int count)
+        public IEnumerable<VideoDto> SelectForUser(string? username, int count)
         {
             var user = _userService.Get(username);
 

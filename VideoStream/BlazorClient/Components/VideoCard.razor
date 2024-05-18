@@ -1,18 +1,29 @@
-﻿
-
-<div class="card" style="width: 15rem; height: 15rem;">
+﻿<div class="card" style="width: 15rem; height: 15rem;">
     <a class="btn btn-primary" @onclick="GoTo">
         <img src="@Image" class="card-img-top" alt="...">
     </a>
     <div class="card-body">
         <h5 class="card-title">@Title</h5>
-        <p class="card-text">Creator: @Creator</p>
+        @if (IsForEditing)
+        {
+            <div class="row">
+                <button class="btn btn-primary col me-1" @onclick="Edit">Edit</button>
+                <button class="btn btn-danger col ms-1" @onclick="ShowConfirm">Delete</button>
+            </div>
+        }
+        else
+        {
+            <p class="card-text">Creator: @Creator</p> 
+        }
     </div>
 </div>
 
 @code
 {
-    @inject NavigationManager NavigationManager
+@using Contracts
+@inject IVideoService VideoService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 
     [Parameter]
     public Guid Id { get; set; }
@@ -26,8 +37,31 @@
     [Parameter]
     public string Creator { get; set; }
 
+    [Parameter]
+    public bool IsForEditing { get; set; } = false;
+
     public void GoTo()
     {
         NavigationManager.NavigateTo($"/video/{Id}", true);
+    }
+
+    public async Task Edit()
+    {
+        NavigationManager.NavigateTo($"/videoedit/{Id}", true);
+    }
+
+    public async Task ShowConfirm()
+    {
+        bool confirm = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure?");
+        if (confirm)
+        {
+            await ConfirmDelete();
+        }
+    }
+
+    public async Task ConfirmDelete()
+    {
+        await VideoService.Delete(Id);
+        NavigationManager.Refresh();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BusinessLayer.Dto;
+using BusinessLayer.Logger;
 using BusinessLayer.RandomGenerator;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repository;
@@ -23,13 +24,14 @@ namespace BusinessLayer.VideoSelector
 
         public IEnumerable<VideoDto> Select(UserDto user, int count)
         {
+            var logger = new AppLogger();
             if (count < 0)
             {
                 throw new ArgumentException("Count must be positive");
             }
 
-            int _count = Math.Min(count, _videoRepository.Count());
-            var videos = _videoRepository.GetAll().ToList();
+            var videos = _videoRepository.Find(v => v.IsPublic).ToList();
+            int _count = Math.Min(count, videos.Count);
 
             List<Video> selectedVideos = new List<Video>();
 

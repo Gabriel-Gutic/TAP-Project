@@ -2,12 +2,17 @@
 using BusinessLayer.Dto;
 using BusinessLayer.Exceptions;
 using BusinessLayer.Services;
+using DataAccessLayer.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
 using WebAPI.Dto;
 using WebAPI.Exceptions;
 using WebAPI.File;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace WebAPI.Controllers
 {
@@ -16,38 +21,41 @@ namespace WebAPI.Controllers
 	public class VideoController : ControllerBase
 	{
 		private readonly IVideoService _videoService;
+		private readonly IUserService _userService;
 		private readonly IFileManager _fileManager;
 
 
-		public VideoController(IVideoService videoService, IFileManager fileManager)
+        public VideoController(IVideoService videoService, IUserService userService, IFileManager fileManager)
 		{
 			_videoService = videoService;
+			_userService = userService;
 			_fileManager = fileManager;
 		}
 
+		// Get information about each video
 		[HttpGet("GetAll")]
 		public IActionResult GetAll()
 		{
-			var entities = _videoService.GetAll()
-				.Select(v => new VideoDto(
-					v.Id,
-					v.Title,
-					v.Description,
-					v.ImagePath,
-					v.Path,
-					v.IsPublic,
-					v.CreatedAt,
-					v.UserId,
-					v.CategoryId
-				));
+			var entities = _videoService.GetAll();
 
 			return Ok(entities);
 		}
 
-		[HttpGet("Get")]
-		public IActionResult Get(Guid id)
+		// Get information about all the videos uploaded 
+		// by an user
+		[HttpGet("GetAllForUser")]
+        public IActionResult GetAllForUser(Guid userId)
 		{
-			var video = _videoService.Get(id);
+			var entities = _videoService.GetAllForUser(userId);
+
+			return Ok(entities);
+		}
+
+		// Get information about a specific video
+		[HttpGet("Get")]
+        public IActionResult Get(Guid id)
+		{
+            var video = _videoService.Get(id);
 
 			if (video == null)
 			{
@@ -66,13 +74,40 @@ namespace WebAPI.Controllers
 				video.CategoryId
 			);
 
-			return Ok(videoOut);
+            return Ok(videoOut);
 		}
 
+		// Insert a new video in the database
+		[Authorize]
 		[HttpPost("Insert")]
-		public async Task<IActionResult> Insert([FromForm]VideoDtoInput videoDtoInput)
+		public async Task<IActionResult> Insert([FromForm] VideoDtoInput videoDtoInput)
 		{
-			string[] paths;
+			var currentUser = HttpContext.User;
+
+			string? username = null;
+
+			if (currentUser.HasClaim(c =>
+			{
+				if (c.Type == ClaimTypes.NameIdentifier)
+				{
+					username = c.Value;
+					return true;
+				}
+				return false;
+			}))
+			{
+				var user = _userService.Get(videoDtoInput.UserId);
+				if (user == null || user.Username != username)
+                {
+					return BadRequest("Invalid user data");
+                }
+            }
+			else
+			{
+                return BadRequest("You don't have permission to upload a video");
+            }
+
+            string[] paths;
 			try
 			{
                 paths = await ExtractImageAndVideo(videoDtoInput.Image, videoDtoInput.Video);
@@ -100,7 +135,10 @@ namespace WebAPI.Controllers
 			return Ok("Video successfully inserted");
 		}
 
-		[HttpPut("Update")]
+        // Update an existing video
+        // BadRequest if the video doesn't exist 
+		// All the fields must be specified, including the Video field
+        [HttpPut("Update")]
 		public async Task<IActionResult> Update(Guid id, [FromForm]VideoDtoInput videoDtoInput)
 		{
             string[] paths;
@@ -147,7 +185,61 @@ namespace WebAPI.Controllers
 			}
 		}
 
-		[HttpDelete("Delete")]
+        // Edit an existing video
+        // BadRequest if the video doesn't exist 
+        // Only Id, Title, Description, IsPublic and CategoryId must be specified
+		// Image is nullable
+        [HttpPatch("Edit")]
+        public async Task<IActionResult> Edit([FromForm] EditVideoDtoInput editInput)
+        {
+			EditVideoDto editVideoDto = new EditVideoDto()
+			{
+				Title = editInput.Title,
+				Description = editInput.Description,
+				IsPublic = editInput.IsPublic,
+				CategoryId = editInput.CategoryId,
+				ImagePath = null,
+			};
+
+			if (editInput.Image != null)
+			{
+                try
+                {
+                    editVideoDto.ImagePath = await _fileManager.ExtractImage(editInput.Image);
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }
+            
+            try
+            {
+                VideoDto? video = _videoService.Get(editInput.Id);
+                _videoService.Edit(editInput.Id, editVideoDto);
+
+				// Delete old image
+				if (editVideoDto.ImagePath != null)
+				{
+					_fileManager.Delete(video.ImagePath);
+				}
+
+                return Ok("Video successfully updated");
+            }
+            catch (EntityNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // Delete an existing video
+        // BadRequest if the video doesn't exist 
+        [HttpDelete("Delete")]
 		public IActionResult Delete(Guid id)
 		{
 			try

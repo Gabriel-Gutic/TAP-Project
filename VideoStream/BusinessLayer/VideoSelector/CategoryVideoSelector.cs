@@ -15,14 +15,12 @@ namespace BusinessLayer.VideoSelector
         private readonly IRepository<VideoCategory> _videoCategoryRepository;
         private readonly IRepository<Video> _videoRepository;
         private readonly IRepository<View> _viewRepository;
-        private readonly IRandomGenerator _random;
 
-        public CategoryVideoSelector(IRepository<VideoCategory> videoCategoryRepository, IRepository<Video> videoRepository, IRepository<View> viewRepository, IRandomGenerator random)
+        public CategoryVideoSelector(IRepository<VideoCategory> videoCategoryRepository, IRepository<Video> videoRepository, IRepository<View> viewRepository)
         {
             _videoCategoryRepository = videoCategoryRepository;
             _videoRepository = videoRepository;
             _viewRepository = viewRepository;
-            _random = random;
         }
 
         public IEnumerable<VideoDto> Select(UserDto user, int count)
@@ -32,7 +30,7 @@ namespace BusinessLayer.VideoSelector
                 throw new ArgumentException("Count must be positive");
             }
 
-            int _count = Math.Min(count, _videoRepository.Count());
+            int _count = Math.Min(count, _videoRepository.Count(v => v.IsPublic));
 
             List<Video> selectedVideos = new List<Video>();
 
@@ -51,7 +49,7 @@ namespace BusinessLayer.VideoSelector
 
             foreach (var category in categories)
             {
-                var videos = _videoRepository.Find(v => v.CategoryId == category.Id)
+                var videos = _videoRepository.Find(v => v.IsPublic && v.CategoryId == category.Id)
                     .OrderByDescending(v => 
                         (from view in _viewRepository.GetAll()
                         where view.VideoId == v.Id

@@ -19,7 +19,8 @@ namespace BlazorClient.Services
         private readonly IFeedbackService _feedbackService;
         private readonly IViewService _viewService;
         private readonly ISubscriberService _subscriberService;
-        private readonly IMultipartAdapter _multipartAdapter;
+        private readonly IMultipartAdapter _multipartUploadAdapter;
+        private readonly IMultipartAdapter _multipartEditAdapter;
 
         private readonly IEventController _eventController; 
 
@@ -33,10 +34,11 @@ namespace BlazorClient.Services
             _subscriberService = subscriberService;
             _eventController = eventController;
 
-            _multipartAdapter = new VideoUploadAdapter();
+            _multipartUploadAdapter = new VideoUploadAdapter();
+            _multipartEditAdapter = new VideoEditAdapter();
         }
 
-        public async Task<VideoData?> GetVideo(string stringId)
+		public async Task<VideoData?> GetVideo(string stringId)
         {
             try
             {
@@ -137,7 +139,7 @@ namespace BlazorClient.Services
 
             try
             {
-                var success = await _httpService.PostMultipart("api/Video/Insert", _multipartAdapter.Adapt(data));
+                var success = await _httpService.PostMultipart("api/Video/Insert", _multipartUploadAdapter.Adapt(data));
                 if (success)
                 {
                     if (data.IsPublic)
@@ -158,5 +160,103 @@ namespace BlazorClient.Services
 
             _navigationManager.NavigateTo($"/videoupload/{errorMessage}");
         }
-	}
+
+		public async Task<IEnumerable<VideoCardData>?> GetAllForUser(Guid userId)
+		{
+			IList<VideoCardData> videoCards = new List<VideoCardData>();
+			try
+			{
+                var user = await _httpService.Get<UserDto>("api/User/Get", "Id", userId);
+				var videos = await _httpService.Get<IEnumerable<VideoDto>>("api/Video/GetAllForUser", "userId", userId);
+                var currentUser = await _userService.GetCurrent();
+
+				string apiUrl = _httpService.GetAPI();
+				foreach (VideoDto video in videos)
+				{
+                    if (video.IsPublic || (currentUser != null && currentUser.Id == userId))
+                    {
+						videoCards.Add(new VideoCardData(
+						    video.Id,
+						    video.Title,
+						    Path.Combine(apiUrl, video.ImagePath),
+						    user.Username
+					    ));
+					}
+				}
+
+				return videoCards;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+
+			return null;
+		}
+
+        public async Task Delete(Guid id)
+        {
+            try
+            {
+                await _httpService.Delete<string>("api/Video/Delete", id);
+            }
+            catch
+            {
+
+            }
+        }
+
+        public async Task<VideoEditData?> GetVideoForEdit(string id)
+        {
+            try
+            {
+                VideoDto? videoDto = await _httpService.Get<VideoDto>("api/Video/Get", "id", id);
+
+                if (videoDto == null)
+                {
+                    _navigationManager.NavigateTo("/", true);
+                }
+
+                string apiUrl = _httpService.GetAPI();
+                return new VideoEditData()
+                {
+                    Id = videoDto.Id,
+                    Title = videoDto.Title,
+                    Description = videoDto.Description,
+                    IsPublic = videoDto.IsPublic,
+                    CategoryId = videoDto.CategoryId,
+                    OldImagePath = Path.Combine(apiUrl, videoDto.ImagePath),
+                    ImageData = null,
+                };
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public async Task EditVideo(VideoEditData data)
+        {
+            string? errorMessage = null;
+
+            try
+            {
+                var success = await _httpService.PatchMultipart("api/Video/Edit", _multipartEditAdapter.Adapt(data));
+                if (success)
+                {
+                    _navigationManager.NavigateTo($"/", true);
+                }
+                else
+                {
+                    throw new Exception("An error occured. Try again.");
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = ex.Message;
+            }
+
+            _navigationManager.NavigateTo($"/{errorMessage}");
+        }
+    }
 }

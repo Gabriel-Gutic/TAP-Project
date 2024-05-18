@@ -1,0 +1,43 @@
+﻿@page "/channel/{id}"
+@using BlazorClient.Components
+
+@if (User != null)
+{
+	<UserCard Id="@User.Id" Username="@User.Username" Image="@User.ImagePath"/>
+	<hr class="hr"/>
+	@if (Videos != null)
+	{
+		<VideoList IsForEditing="@(CurrentUser != null && CurrentUser.Id == User.Id)" Videos="@Videos"/>
+	}
+}
+
+@code {
+@using BlazorClient.Data;
+@using BlazorClient.Contracts;
+@inject IUserService UserService;
+@inject IVideoService VideoService;
+@inject NavigationManager NavigationManager;
+
+	[Parameter]
+	public string Id { get; set; }
+
+	protected UserData? CurrentUser { get; set; }
+	protected UserData User { get; set; }
+
+	protected IEnumerable<VideoCardData> Videos { get; set; }
+
+	protected override async Task OnParametersSetAsync()
+	{
+		string error = "Error while trying to access the channel";
+
+		User = await UserService.Get(new Guid(Id));
+		if (User == null)
+		{
+			NavigationManager.NavigateTo($"/{{{error}}}");
+		}
+
+		Videos = await VideoService.GetAllForUser(User.Id);
+
+		CurrentUser = await UserService.GetCurrent();
+	}
+}

@@ -18,6 +18,7 @@ namespace WebAPI.Controllers
             _feedbackService = feedbackService;
         }
 
+        // Get information about every feedback
         [HttpGet("GetAll")]
         public IActionResult GetAll()
         {
@@ -25,6 +26,7 @@ namespace WebAPI.Controllers
             return Ok(entities);
         }
 
+        // Get information about a specific feedback
         [HttpGet("Get")]
         public IActionResult Get(Guid id)
         {
@@ -37,24 +39,30 @@ namespace WebAPI.Controllers
             return Ok(feedback);
         }
 
+        // Get the like count for a specific video 
         [HttpGet("CountPositive")]
         public IActionResult GetCountPositive(Guid videoId)
         {
             return Ok(_feedbackService.CountPositive(videoId));
         }
 
+        // Get the dislike count for a specific video 
         [HttpGet("CountNegative")]
         public IActionResult GetCountNegative(Guid videoId)
         {
             return Ok(_feedbackService.CountNegative(videoId));
         }
 
+        // Find the feedback that a user left on a video
+        // Return null if the user didn't leave a feedback to 
+        // that video
         [HttpGet("Find")]
         public IActionResult Find(Guid userId, Guid videoId)
         {
             return Ok(_feedbackService.FindFeedback(userId, videoId));
         }
 
+        // Insert a new feedback to the database
         [HttpPost("Insert")]
         public IActionResult Insert(FeedbackDtoInput feedbackDtoInput)
         {
@@ -77,6 +85,8 @@ namespace WebAPI.Controllers
             return Ok("Feedback successfully inserted");
         }
 
+        // Update an existing feedback
+        // BadRequest if the feedback doesn't exist 
         [HttpPut("Update")]
         public IActionResult Update(Guid id, FeedbackDtoInput feedbackDtoInput)
         {
@@ -102,6 +112,8 @@ namespace WebAPI.Controllers
             }
         }
 
+        // Edit an existing feedback
+        // Only the IsPositive field is affected
         [HttpPatch("Edit")]
         public IActionResult Edit(FeedbackDtoInput feedbackDtoInput)
         {
@@ -127,6 +139,8 @@ namespace WebAPI.Controllers
             }
         }
 
+        // Delete an existing feedback
+        // BadRequest if the feedback doesn't exist 
         [HttpDelete("Delete")]
         public IActionResult Delete(Guid id)
         {

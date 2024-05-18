@@ -22,17 +22,17 @@
     <br />
     <div id="visibility">
         <div class="form-check">
-            <input class="form-check-input" type="radio" name="videoVisibility" id="videoVisibilityPublic" 
-                checked="@(Video.IsPublic == true)" 
-                @onchange="@(() => Video.IsPublic = true)">
+            <input class="form-check-input" type="radio" name="videoVisibility" id="videoVisibilityPublic"
+                   checked="@(Video.IsPublic == true)"
+                   @onchange="@(() => Video.IsPublic = true)">
             <label class="form-check-label" for="videoVisibilityPublic">
                 Public
             </label>
         </div>
         <div class="form-check">
-            <input class="form-check-input" type="radio" name="videoVisibility" id="videoVisibilityPrivate" 
-                checked="@(Video.IsPublic == false)"
-                @onchange="@(() => Video.IsPublic = false)">
+            <input class="form-check-input" type="radio" name="videoVisibility" id="videoVisibilityPrivate"
+                   checked="@(Video.IsPublic == false)"
+                   @onchange="@(() => Video.IsPublic = false)">
             <label class="form-check-label" for="videoVisibilityPrivate">
                 Private
             </label>
@@ -65,14 +65,17 @@
 
 @code
 {
-@using Data
-@using Contracts
-@inject IUserService UserService
-@inject IVideoService VideoService
-@inject IVideoCategoryService VideoCategoryService
-@inject NavigationManager NavigationManager
+    @using Data
+    @using Contracts
+    @inject IUserService UserService
 
-	protected UserData? CurrentUser { get; set; }
+    @inject IVideoService VideoService
+
+    @inject IVideoCategoryService VideoCategoryService
+
+    @inject NavigationManager NavigationManager
+
+    protected UserData? CurrentUser { get; set; }
 
     [Parameter]
     public string? ErrorMessage { get; set; }
@@ -81,14 +84,14 @@
 
     protected IEnumerable<VideoCategoryData>? Categories { get; set; }
 
-	protected override async Task OnParametersSetAsync()
-	{
-		CurrentUser = await UserService.GetCurrent();
-		if (CurrentUser == null)
-		{
-			string error = "You need to be logged in to upload a video";
-			NavigationManager.NavigateTo($"/login/{error}", true);
-		}
+    protected override async Task OnParametersSetAsync()
+    {
+        CurrentUser = await UserService.GetCurrent();
+        if (CurrentUser == null)
+        {
+            string error = "You need to be logged in to upload a video";
+            NavigationManager.NavigateTo($"/login/{error}", true);
+        }
 
         Video.UserId = CurrentUser.Id;
 

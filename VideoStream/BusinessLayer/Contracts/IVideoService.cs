@@ -13,10 +13,13 @@ namespace BusinessLayer.Contracts
 		public int GetCount();
 
 		public IEnumerable<VideoDto> GetAll();
+		public IEnumerable<VideoDto>? GetAllForUser(Guid userId);
 
 		public VideoDto? Get(Guid id);
 
 		public void Insert(VideoDto userDto);
+
+		public void Edit(Guid id, EditVideoDto userDto);
 
 		public void Update(Guid id, VideoDto userDto);
 

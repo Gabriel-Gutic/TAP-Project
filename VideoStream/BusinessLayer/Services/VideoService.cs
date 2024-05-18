@@ -65,17 +65,17 @@ namespace BusinessLayer.Services
 			);
 		}
 
-		public void Insert(VideoDto userDto)
+		public void Insert(VideoDto videoDto)
 		{
 			_videoRepository.Add(new Video()
 			{
-				Title = userDto.Title,
-				Description = userDto.Description,
-                ImagePath = userDto.ImagePath,
-                Path = userDto.Path,
-				IsPublic = userDto.IsPublic,
-				UserId = userDto.UserId,
-				CategoryId = userDto.CategoryId
+				Title = videoDto.Title,
+				Description = videoDto.Description,
+                ImagePath = videoDto.ImagePath,
+                Path = videoDto.Path,
+				IsPublic = videoDto.IsPublic,
+				UserId = videoDto.UserId,
+				CategoryId = videoDto.CategoryId
 			});
 
 			_videoRepository.SaveChanges();
@@ -83,7 +83,7 @@ namespace BusinessLayer.Services
 			_logger.Info("New item inserted in Video Table");
 		}
 
-		public void Update(Guid id, VideoDto userDto)
+		public void Update(Guid id, VideoDto videoDto)
 		{
 			Video video = _videoRepository.GetById(id);
 			if (video == null)
@@ -91,13 +91,13 @@ namespace BusinessLayer.Services
 				throw new EntityNotFoundException("Video not found");
 			}
 
-			video.Title = userDto.Title;
-			video.Description = userDto.Description;
-			video.ImagePath = userDto.ImagePath;
-			video.Path = userDto.Path;
-			video.IsPublic = userDto.IsPublic;
-			video.UserId = userDto.UserId;
-			video.CategoryId = userDto.CategoryId;
+			video.Title = videoDto.Title;
+			video.Description = videoDto.Description;
+			video.ImagePath = videoDto.ImagePath;
+			video.Path = videoDto.Path;
+			video.IsPublic = videoDto.IsPublic;
+			video.UserId = videoDto.UserId;
+			video.CategoryId = videoDto.CategoryId;
 
 			_videoRepository.SaveChanges();
 
@@ -114,5 +114,44 @@ namespace BusinessLayer.Services
 
 			_logger.Info("Item deleted from Video Table");
 		}
+
+		public IEnumerable<VideoDto>? GetAllForUser(Guid userId)
+		{
+			return _videoRepository.Find(v => v.UserId == userId)
+				.OrderByDescending(v => v.CreatedAt)
+				.Select(v => new VideoDto(
+					v.Id,
+					v.Title,
+					v.Description,
+					v.ImagePath,
+					v.Path,
+					v.IsPublic,
+					v.CreatedAt,
+					v.UserId,
+					v.CategoryId
+				));
+		}
+
+        public void Edit(Guid id, EditVideoDto videoDto)
+        {
+            Video video = _videoRepository.GetById(id);
+            if (video == null)
+            {
+                throw new EntityNotFoundException("Video not found");
+            }
+
+            video.Title = videoDto.Title;
+            video.Description = videoDto.Description;
+			if (videoDto.ImagePath != null)
+			{
+				video.ImagePath = videoDto.ImagePath;
+			}
+            video.IsPublic = videoDto.IsPublic;
+            video.CategoryId = videoDto.CategoryId;
+
+            _videoRepository.SaveChanges();
+
+            _logger.Info("Item edited in Video Table");
+        }
     }
 }

@@ -31,7 +31,7 @@ namespace BusinessLayer.VideoSelector
                 case "Random":
                     return new RandomVideoSelector(_videoRepository, _randomGenerator);
                 case "Category":
-                    return new CategoryVideoSelector(_videoCategoryRepository, _videoRepository, _viewRepository, _randomGenerator);
+                    return new CategoryVideoSelector(_videoCategoryRepository, _videoRepository, _viewRepository);
             }
             return new UnknownVideoSelector();
         }

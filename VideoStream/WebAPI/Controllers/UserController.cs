@@ -28,7 +28,8 @@ namespace WebAPI.Controllers
 			_logger = appLogger;
 		}
 
-		[HttpGet("GetAll")]
+        // Get information about all the users
+        [HttpGet("GetAll")]
 		public IActionResult GetAll() 
 		{
 			var entities = _userService.GetAll()
@@ -46,8 +47,9 @@ namespace WebAPI.Controllers
 			return Ok(entities);
 		}
 
+        // Get information about a specific user
 		[HttpGet("Get")]
-		public IActionResult Get(Guid id)
+        public IActionResult Get(Guid id)
 		{
 			var user = _userService.Get(id);
 
@@ -70,8 +72,9 @@ namespace WebAPI.Controllers
 			return Ok(userOut);
 		}
 
+        // Check if a user with the specific username exists
 		[HttpGet("IsUsernameValid")]
-		public IActionResult IsUsernameValid(string username)
+        public IActionResult IsUsernameValid(string username)
 		{
 			if (_userService.IsUsernameUsed(username))
 			{
@@ -81,6 +84,7 @@ namespace WebAPI.Controllers
 			return Ok(true);
 		}
 
+        // Check if a user with the specific email exists
         [HttpGet("IsEmailValid")]
         public IActionResult IsEmailValid(string email)
         {
@@ -92,8 +96,10 @@ namespace WebAPI.Controllers
             return Ok(true);
         }
 
+        // Insert a new user in the database
+		// The Image is nullable
         [AllowAnonymous]
-		[HttpPost("Insert")]
+        [HttpPost("Insert")]
 		public async Task<IActionResult> Insert([FromForm]UserDtoInput userDtoInput)
 		{
             string? imagePath = null;
@@ -130,7 +136,9 @@ namespace WebAPI.Controllers
 			}
 		}
 
-		[HttpPut("Update")]
+        // Update an existing user
+        // BadRequest if the user doesn't exist 
+        [HttpPut("Update")]
 		public async Task<IActionResult> Update(Guid id, [FromForm]UserDtoInput userDtoInput)
 		{
             string? imagePath = null;
@@ -184,7 +192,9 @@ namespace WebAPI.Controllers
 			}
 		}
 
-		[HttpDelete("Delete")]
+        // Delete an existing user
+        // BadRequest if the user doesn't exist 
+        [HttpDelete("Delete")]
 		public IActionResult Delete(Guid id)
 		{
 			try

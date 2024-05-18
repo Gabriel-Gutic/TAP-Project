@@ -1,0 +1,114 @@
+﻿@page "/videoedit/{id}"
+
+<PageTitle>Edit Video</PageTitle>
+
+@if (Video != null && Categories != null)
+{
+    <form @onsubmit="Edit" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" id="title" @bind="Video.Title" required>
+        </div>
+        <br />
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea @bind=@(Video.Description) class="form-control" id="description" rows="3"></textarea>
+        </div>
+        <br />
+        <div id="visibility">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="videoVisibility" id="videoVisibilityPublic"
+                       checked="@(Video.IsPublic == true)"
+                       @onchange="@(() => Video.IsPublic = true)">
+                <label class="form-check-label" for="videoVisibilityPublic">
+                    Public
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="videoVisibility" id="videoVisibilityPrivate"
+                       checked="@(Video.IsPublic == false)"
+                       @onchange="@(() => Video.IsPublic = false)">
+                <label class="form-check-label" for="videoVisibilityPrivate">
+                    Private
+                </label>
+            </div>
+        </div>
+        <br />
+        <img src="@Video.OldImagePath" style="max-width: 200px" class="card-img-top" alt="...">
+        <br />
+        <div class="form-group">
+            <label for="thumbnail">Thumbnail</label>
+            <InputFile id="thumbnail" OnChange="@OnThumbnailInput"></InputFile>
+        </div>
+        <br />
+        @if (Categories != null)
+        {
+            <select class="form-select" @bind=@(Video.CategoryId) required>
+                @foreach (var category in Categories)
+                {
+                    <option value="@category.Id">@category.Name</option>
+                }
+            </select>
+        }
+        <br />
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+}
+
+
+
+@code
+{
+    @using Data
+    @using Contracts
+    @inject IUserService UserService
+
+    @inject IVideoService VideoService
+
+    @inject IVideoCategoryService VideoCategoryService
+
+    @inject NavigationManager NavigationManager
+
+    protected UserData? CurrentUser { get; set; }
+
+    [Parameter]
+    public string Id { get; set; }
+
+    protected VideoEditData Video;
+
+    protected IEnumerable<VideoCategoryData>? Categories { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Video = await VideoService.GetVideoForEdit(Id);
+        if (Video == null)
+        {
+            string error = "An error occured while trying to load the edit page";
+            NavigationManager.NavigateTo($"/{error}", true);
+        }
+
+        CurrentUser = await UserService.GetCurrent();
+        if (CurrentUser == null)
+        {
+            string error = "You need to be logged in to edit a video";
+            NavigationManager.NavigateTo($"/login/{error}", true);
+        }
+
+        Categories = await VideoCategoryService.GetAll();
+        if (Categories == null)
+        {
+            string error = "An error occured while trying to load the edit page";
+            NavigationManager.NavigateTo($"/{error}", true);
+        }
+    }
+
+    public async Task Edit()
+    {
+        await VideoService.EditVideo(Video);
+    }
+
+    public void OnThumbnailInput(InputFileChangeEventArgs e)
+    {
+        Video.ImageData = e.File == null ? null : new FileUploadData(e.File);
+    }
+}

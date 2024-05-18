@@ -1,4 +1,5 @@
-﻿using BusinessLayer.Contracts;
+﻿using Asp.Versioning;
+using BusinessLayer.Contracts;
 using BusinessLayer.Dto;
 using BusinessLayer.Logger;
 using Microsoft.AspNetCore.Authorization;
@@ -26,6 +27,7 @@ namespace WebAPI.Controllers
             _logger = logger;
         }
 
+        // Get the data for the user from JWTToken
         [Authorize]
         [HttpGet("GetUser")]
         public IActionResult GetUser()
@@ -56,6 +58,7 @@ namespace WebAPI.Controllers
             return NotFound("User not found");
         }
 
+        // Generate Token (1 year valability) for a valid username login
         [HttpPost("Token")]
         public IActionResult GenerateToken(AuthDto authDto)
         {

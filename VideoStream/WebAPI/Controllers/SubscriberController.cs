@@ -18,6 +18,7 @@ namespace WebAPI.Controllers
             _subscriberService = subscriberService;
         }
 
+        // Get information about all the subscribers
         [HttpGet("GetAll")]
         public IActionResult GetAll()
         {
@@ -25,6 +26,7 @@ namespace WebAPI.Controllers
             return Ok(entities);
         }
 
+        // Get all the users a user has subscribed to
         [HttpGet("GetCreators")]
         public IActionResult GetCreators(Guid subscriberId)
         {
@@ -32,6 +34,7 @@ namespace WebAPI.Controllers
             return Ok(entities);
         }
 
+        // Get information about a specific subscriber
         [HttpGet("Get")]
         public IActionResult Get(Guid id)
         {
@@ -43,18 +46,21 @@ namespace WebAPI.Controllers
             return Ok(entity);
         }
 
+        // Check if a user is subscriber for another user
         [HttpPost("IsSubscriber")]
         public IActionResult IsSubscriber(SubscriberDtoInput subscriberDtoInput)
         {
             return Ok(_subscriberService.IsSubscriber(subscriberDtoInput.CreatorId, subscriberDtoInput.SubscriberId));
         }
 
+        // Get the subscriber count for a creator
         [HttpGet("Count")]
         public IActionResult Count(Guid creatorId)
         {
             return Ok(_subscriberService.Count(creatorId));
         }
 
+        // Get information about all the subscibers for a specific creator
         [HttpGet("GetSubscribers")]
         public IActionResult GetSubscribers(Guid creatorId)
         {
@@ -62,6 +68,7 @@ namespace WebAPI.Controllers
             return Ok(entities);
         }
 
+        // Insert a new subscriber in the database
         [HttpPost("Subscribe")]
         public IActionResult Subscribe(SubscriberDtoInput subscriberDtoInput)
         {
@@ -76,6 +83,7 @@ namespace WebAPI.Controllers
             }
         }
 
+        // Delete a subscriber from the database
         [HttpDelete("Unsubscribe")]
         public IActionResult Unsubscribe(SubscriberDtoInput subscriberDtoInput)
         {

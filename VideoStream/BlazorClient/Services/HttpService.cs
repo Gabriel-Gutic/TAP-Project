@@ -120,7 +120,33 @@ namespace BlazorClient.Services
             HttpResponseMessage? response = null;
             try
             {
+                TokenDto? token = await _localStorageService.GetItem<TokenDto>("JWTToken");
+                if (token != null)
+                {
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
+                }
+
                 response = await _httpClient.PostAsync(uri, content);
+                return response.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> PatchMultipart(string uri, MultipartFormDataContent content)
+        {
+            HttpResponseMessage? response = null;
+            try
+            {
+                TokenDto? token = await _localStorageService.GetItem<TokenDto>("JWTToken");
+                if (token != null)
+                {
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
+                }
+
+                response = await _httpClient.PatchAsync(uri, content);
                 return response.IsSuccessStatusCode;
             }
             catch

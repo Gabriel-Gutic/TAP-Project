@@ -135,8 +135,13 @@ namespace BusinessLayer.Services
             return _userRepository.Contains(u => u.Email == email);
         }
 
-        public UserDto? Get(string username)
+        public UserDto? Get(string? username)
         {
+			if (username == null)
+			{
+				return null;
+			}
+
             var user = _userRepository.Find(u => u.Username == username).FirstOrDefault();
             if (user == null)
             {

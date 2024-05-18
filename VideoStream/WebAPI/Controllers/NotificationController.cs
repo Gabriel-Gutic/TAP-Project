@@ -16,12 +16,14 @@ namespace WebAPI.Controllers
             _notificationService = notificationService;
         }
 
+        // Get information about all the notifications
         [HttpGet("GetAll")]
         public IActionResult GetAll()
         {
             return Ok(_notificationService.GetAll());
         }
 
+        // Insert a new notification, when a user subscribe to another user
         [HttpPost("Subscriber")]
         public IActionResult SendSubscriberNotification(SubscriberNotificationDto data)
         {
@@ -37,6 +39,7 @@ namespace WebAPI.Controllers
             return Ok("Notification successufully sended");
         }
 
+        // Insert a new notification, when a user uploads a video
         [HttpPost("VideoUpload")]
         public IActionResult SendVideoUploadNotification(VideoUploadNotificationDto data)
         {
