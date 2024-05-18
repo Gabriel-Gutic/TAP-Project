@@ -255,3 +255,29 @@
 [5/18/2024 8:32:32 PM] [INFO] Item edited in Video Table
 [5/18/2024 8:32:50 PM] [INFO] Item edited in Video Table
 [5/18/2024 8:33:03 PM] [INFO] Item deleted from Video Table
+[5/18/2024 10:17:37 PM] [INFO] New item inserted in User Table
+[5/18/2024 10:17:51 PM] [INFO] New item inserted in View Table
+[5/18/2024 10:17:58 PM] [INFO] New subscriber
+[5/18/2024 10:17:58 PM] [INFO] New item inserted in Notification Table
+[5/18/2024 10:18:02 PM] [INFO] New item inserted in View Table
+[5/18/2024 10:18:06 PM] [INFO] New item inserted in Feedback Table
+[5/18/2024 10:18:09 PM] [INFO] New item inserted in View Table
+[5/18/2024 10:18:15 PM] [INFO] New item inserted in Comment Table
+[5/18/2024 10:18:18 PM] [INFO] New item inserted in View Table
+[5/18/2024 10:18:22 PM] [INFO] New item inserted in Comment Table
+[5/18/2024 10:18:25 PM] [INFO] New item inserted in View Table
+[5/18/2024 10:18:32 PM] [INFO] New item inserted in View Table
+[5/18/2024 10:18:42 PM] [INFO] New item inserted in View Table
+[5/18/2024 10:18:45 PM] [INFO] New subscriber
+[5/18/2024 10:18:45 PM] [INFO] New item inserted in Notification Table
+[5/18/2024 10:18:48 PM] [INFO] New item inserted in View Table
+[5/18/2024 10:18:51 PM] [INFO] New item inserted in Feedback Table
+[5/18/2024 10:18:54 PM] [INFO] New item inserted in View Table
+[5/18/2024 10:19:00 PM] [INFO] New item inserted in View Table
+[5/18/2024 10:19:02 PM] [INFO] New item inserted in Feedback Table
+[5/18/2024 10:19:05 PM] [INFO] New item inserted in View Table
+[5/18/2024 10:19:40 PM] [INFO] New item inserted in Video Table
+[5/18/2024 10:19:55 PM] [INFO] New item inserted in View Table
+[5/18/2024 10:20:46 PM] [INFO] New item inserted in Video Table
+[5/18/2024 10:21:35 PM] [INFO] New item inserted in Video Table
+[5/18/2024 10:22:06 PM] [INFO] Item edited in Video Table
